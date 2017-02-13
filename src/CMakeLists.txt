@@ -1,3 +1,5 @@
+add_subdirectory(cfitsio)
+
 # Append current NVCC flags by something, eg comput capability
 set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} --gpu-architecture sm_20)
 
