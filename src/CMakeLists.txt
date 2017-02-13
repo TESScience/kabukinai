@@ -1,11 +1,12 @@
-add_subdirectory(cfitsio)
+ADD_SUBDIRECTORY(cfitsio)
+ADD_SUBDIRECTORY(argparse)
 
 # Append current NVCC flags by something, eg comput capability
-set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} --gpu-architecture sm_20)
+SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS})
 
-set(CUDASRCS main.cu)
+SET(CUDASRCS main.cu)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
-set(CMAKE_CXX_FLAG "-g -Wall")
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
+SET(CMAKE_CXX_FLAG "-g -Wall")
 CUDA_ADD_EXECUTABLE(kabukinai ${CUDASRCS})
-TARGET_LINK_LIBRARIES(kabukinai LINK_PRIVATE cfitsio)
+TARGET_LINK_LIBRARIES(kabukinai LINK_PRIVATE cfitsio argparse)
