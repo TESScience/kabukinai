@@ -81,27 +81,27 @@ SET_TARGET_PROPERTIES(${LIB_NAME} PROPERTIES VERSION ${${PROJECT_NAME}_VERSION} 
 install(TARGETS ${LIB_NAME} DESTINATION ${LIB_DESTINATION})
 install(FILES ${H_FILES} DESTINATION ${INCLUDE_INSTALL_DIR} COMPONENT Devel)
 
-ENABLE_TESTING()
+# ENABLE_TESTING()
+# 
+# ADD_EXECUTABLE(TestProg testprog.c)
+# TARGET_LINK_LIBRARIES(TestProg ${LIB_NAME})
+# ADD_TEST(TestProg TestProg)
+# # Copy testprog.tpt to build directory to allow quick test
+# # of ./TestProg (or .\Release\TestProg.exe in MSVC):
+# FILE(COPY ${CMAKE_CURRENT_SOURCE_DIR}/testprog.tpt DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-ADD_EXECUTABLE(TestProg testprog.c)
-TARGET_LINK_LIBRARIES(TestProg ${LIB_NAME})
-ADD_TEST(TestProg TestProg)
-# Copy testprog.tpt to build directory to allow quick test
-# of ./TestProg (or .\Release\TestProg.exe in MSVC):
-FILE(COPY ${CMAKE_CURRENT_SOURCE_DIR}/testprog.tpt DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
-ADD_EXECUTABLE(cookbook cookbook.c)
-TARGET_LINK_LIBRARIES(cookbook ${LIB_NAME})
-ADD_TEST(cookbook cookbook)
-
-ADD_EXECUTABLE(FPack fpack.c fpackutil.c)
-TARGET_LINK_LIBRARIES(FPack ${LIB_NAME})
-
-ADD_EXECUTABLE(Funpack funpack.c fpackutil.c)
-TARGET_LINK_LIBRARIES(Funpack ${LIB_NAME})
-
-ADD_EXECUTABLE(Fitscopy fitscopy.c)
-TARGET_LINK_LIBRARIES(Fitscopy ${LIB_NAME})
+# ADD_EXECUTABLE(cookbook cookbook.c)
+# TARGET_LINK_LIBRARIES(cookbook ${LIB_NAME})
+# ADD_TEST(cookbook cookbook)
+# 
+# ADD_EXECUTABLE(FPack fpack.c fpackutil.c)
+# TARGET_LINK_LIBRARIES(FPack ${LIB_NAME})
+# 
+# ADD_EXECUTABLE(Funpack funpack.c fpackutil.c)
+# TARGET_LINK_LIBRARIES(Funpack ${LIB_NAME})
+# 
+# ADD_EXECUTABLE(Fitscopy fitscopy.c)
+# TARGET_LINK_LIBRARIES(Fitscopy ${LIB_NAME})
 
 # To expands the command line arguments in Windows, see:
 # http://msdn.microsoft.com/en-us/library/8bch7bkk.aspx
