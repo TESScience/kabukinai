@@ -1,6 +1,4 @@
-ADD_SUBDIRECTORY(cfitsio)
-ADD_SUBDIRECTORY(argparse)
-ADD_SUBDIRECTORY(munit)
+ADD_SUBDIRECTORY(libraries)
 
 # Append current NVCC flags by something, eg comput capability
 SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS})

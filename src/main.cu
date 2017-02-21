@@ -1,7 +1,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include "externalClass.cu" // important to include .cu file, not header file
-#include "cfitsio/fitsio.h"
+#include "libraries/cfitsio/fitsio.h"
 
 int main(int argc, char *argv[]) {
 	externalClass myStuff;
