@@ -1,11 +1,11 @@
 ADD_SUBDIRECTORY(libraries)
 
-# Append current NVCC flags by something, eg comput capability
-SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS})
-
-SET(CUDASRCS main.cu)
-
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 SET(CMAKE_CXX_FLAG "-g -Wall")
+
+# kabukinai
+
+SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS})
+SET(CUDASRCS binaries/kabukinai/main.cu)
 CUDA_ADD_EXECUTABLE(kabukinai ${CUDASRCS})
-TARGET_LINK_LIBRARIES(kabukinai LINK_PRIVATE cfitsio argparse)
+TARGET_LINK_LIBRARIES(kabukinai cfitsio argparse)
