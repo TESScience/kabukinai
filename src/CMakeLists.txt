@@ -1,11 +1,2 @@
 ADD_SUBDIRECTORY(libraries)
-
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-SET(CMAKE_CXX_FLAG "-g -Wall")
-
-# kabukinai
-
-SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS})
-SET(CUDASRCS binaries/kabukinai/main.cu)
-CUDA_ADD_EXECUTABLE(kabukinai ${CUDASRCS})
-TARGET_LINK_LIBRARIES(kabukinai cfitsio argparse)
+ADD_SUBDIRECTORY(binaries)

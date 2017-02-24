@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(CUDACMAKETEST)
+project(KABUKINAI)
 
 find_package(CUDA REQUIRED)
 add_subdirectory(src)
