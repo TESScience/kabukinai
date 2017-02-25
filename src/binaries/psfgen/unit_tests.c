@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <assert.h>
-#include <stdio.h>
 #include "psf.h"
 
 int main(int argc, const char *argv[]) {
