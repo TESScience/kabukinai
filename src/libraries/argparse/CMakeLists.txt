@@ -1,1 +1,1 @@
-ADD_LIBRARY(argparse SHARED argparse.c)
+ADD_LIBRARY(libargparse SHARED argparse.c)

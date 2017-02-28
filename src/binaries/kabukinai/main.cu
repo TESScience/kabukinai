@@ -22,7 +22,6 @@ int main(int argc, char *argv[]) {
 
 	fitsfile *fptr;
 	int status = 0;
-	fits_open_file(&fptr, argv[1], READONLY, &status);
 	if (status == 1) {
 		std::cout << "Program read fits input cleanly" << std::endl;
 		return EXIT_SUCCESS;

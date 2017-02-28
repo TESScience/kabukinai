@@ -31,6 +31,7 @@ double cauchy_psf(double x, double y, double g) {
     const double cy0 = twice_y - 1;
     const double cy1 = twice_y + 1;
 
+    // TODO: Collapse atan2
     return (atan2(twice_g * (t0 + cy0 * rt0), -cx0 * cy0 * (cy0 + rt0)) +
             atan2(twice_g * (t1 + cy1 * rt1), cx0 * cy1 * (cy1 + rt1)) +
             atan2(-twice_g * (t2 + cy0 * rt2), -cx1 * cy0 * (cy0 + rt2)) +

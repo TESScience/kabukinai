@@ -105,6 +105,20 @@ argparse_getvalue(struct argparse *self, const struct argparse_option *opt,
         if (s[0] != '\0')
             argparse_error(self, opt, "expects a numerical value", flags);
         break;
+    case ARGPARSE_OPT_DOUBLE:
+        if (self->optvalue) {
+            *(double *)opt->value = strtod(self->optvalue, (char **)&s);
+            self->optvalue = NULL;
+        } else if (self->argc > 1) {
+            self->argc--;
+            *(double *)opt->value = strtod(*++self->argv, (char **)&s);
+        } else {
+            argparse_error(self, opt, "requires a value", flags);
+        }
+        if (s[0] != '\0')
+            argparse_error(self, opt, "expects a numerical value", flags);
+        break;
+
     default:
         assert(0);
     }
@@ -127,6 +141,7 @@ argparse_options_check(const struct argparse_option *options)
         case ARGPARSE_OPT_BIT:
         case ARGPARSE_OPT_INTEGER:
         case ARGPARSE_OPT_STRING:
+        case ARGPARSE_OPT_DOUBLE:
         case ARGPARSE_OPT_GROUP:
             continue;
         default:
@@ -309,6 +324,8 @@ argparse_usage(struct argparse *self)
             len += strlen("=<int>");
         } else if (options->type == ARGPARSE_OPT_STRING) {
             len += strlen("=<str>");
+        } else if (options->type == ARGPARSE_OPT_DOUBLE) {
+            len += strlen("=<double>");
         }
         len = ceil((float)len / 4) * 4;
         if (usage_opts_width < len) {
@@ -341,6 +358,8 @@ argparse_usage(struct argparse *self)
             pos += fprintf(stdout, "=<int>");
         } else if (options->type == ARGPARSE_OPT_STRING) {
             pos += fprintf(stdout, "=<str>");
+        } else if (options->type == ARGPARSE_OPT_DOUBLE) {
+            pos += fprintf(stdout, "=<double>");
         }
         if (pos <= usage_opts_width) {
             pad = usage_opts_width - pos;
