@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../../libraries/argparse/argparse.h"
-#include "psf.h"
+#include "../../libraries/psf/psf.h"
 
 static const char* description = "\npsfgen is a program for creating a FITS file containing a TESS point spread function image";
 
@@ -11,17 +11,19 @@ static const char* usage[] = {
 };
 
 int main(int argc, const char* argv[]) {
+
+
 	double gamma = 0.5;
 	char gamma_description[256];
-	snprintf(gamma_description, 256, "the width of the Cauchy point spread function, defaults to %g", gamma);
+	snprintf(gamma_description, sizeof(gamma_description), "the width of the Cauchy point spread function, defaults to %g", gamma);
 
 	int side_length = 32;
 	char side_length_description[256];
-	snprintf(side_length_description, 256, "the length of one side of the square output array in CCD pixels, defaults to %i", side_length);
+	snprintf(side_length_description, sizeof(side_length_description), "the length of one side of the square output array in CCD pixels, defaults to %i", side_length);
 
 	int oversampling = 3; 
 	char oversampling_description[256];
-	snprintf(side_length_description, 256,"the oversampling of the CCD pixel in the output array, defaults to %i", oversampling);
+	snprintf(side_length_description, sizeof(oversampling_description), "the oversampling of the CCD pixel in the output array, defaults to %i", oversampling);
 
 	struct argparse_option options[] = {
 		OPT_HELP(),
@@ -46,5 +48,24 @@ int main(int argc, const char* argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
-	exit(write_psf_fits(gamma, side_length, oversampling, argv[0]));
+	const char * file_name = argv[0];
+	char history[1024];
+	snprintf(history, sizeof(history), "psgen --gamma %g --side-length %d --oversampling %d %s",
+                                           gamma,
+                                           side_length,
+                                           oversampling,
+                                           file_name);
+
+	psf_data data;
+	if (psf_data_init(&data, gamma, side_length, oversampling) != KABUKINAI_PSF_SUCCESS) {
+		fprintf(stderr, "Could not initialize PSF data\n");
+		exit(EXIT_FAILURE);
+	}
+        if (write_psf_fits(data, file_name, history) != KABUKINAI_PSF_SUCCESS) {
+		fprintf(stderr, "Could not write FITS file \"%s\"\n", file_name);
+		psf_data_release(data);
+		exit(EXIT_FAILURE);
+	}
+        psf_data_release(data);
+	exit(EXIT_SUCCESS);
 }

@@ -1,7 +1,6 @@
 #include <iostream>
 #include <stdlib.h>
 #include "externalClass.cu" // important to include .cu file, not header file
-#include "../../libraries/cfitsio/fitsio.h"
 
 int main(int argc, char *argv[]) {
 	externalClass myStuff;
@@ -20,7 +19,6 @@ int main(int argc, char *argv[]) {
 	for (int i = 0; i < localN; i++)
 		std::cout << localFloat[i] << std::endl;
 
-	fitsfile *fptr;
 	int status = 0;
 	if (status == 1) {
 		std::cout << "Program read fits input cleanly" << std::endl;
