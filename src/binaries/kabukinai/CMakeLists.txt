@@ -1,6 +1,6 @@
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 SET(CMAKE_CXX_FLAG "-g -Wall")
 SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS})
-SET(CUDA_SRCS main.cu)
+SET(CUDA_SRCS main.cu star_data.h parse_star_array_tsv.cpp)
 CUDA_ADD_EXECUTABLE(kabukinai ${CUDA_SRCS})
 TARGET_LINK_LIBRARIES(kabukinai cfitsio libargparse)

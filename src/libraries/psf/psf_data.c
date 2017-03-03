@@ -7,7 +7,7 @@ int psf_data_init(psf_data * data, const double gamma, const int side_length, co
 	data -> side_length = side_length;
 	data -> oversampling = oversampling;
 	data -> dimensions[0] = data -> dimensions[1] = side_length * oversampling;
-	data -> image_pixels = calloc((data -> dimensions[0]) * (data -> dimensions[1]), sizeof(float));
+	data -> image_pixels = (float*) calloc((data -> dimensions[0]) * (data -> dimensions[1]), sizeof(float));
 	if ((data -> image_pixels) == NULL) {
 		fprintf(stderr, "Could not allocate memory for image pixels\n");
 		return KABUKINAI_PSF_FAILURE;

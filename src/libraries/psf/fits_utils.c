@@ -74,7 +74,7 @@ int read_psf_fits(psf_data * data, const char* fits_file_name) {
 
 	LONGLONG image_pixels_size = data -> dimensions[0] * data -> dimensions[1];
 
-	data -> image_pixels = calloc(image_pixels_size, sizeof(float));
+	data -> image_pixels = (float*) calloc(image_pixels_size, sizeof(float));
 
 	if ((data -> image_pixels) == NULL) {
 		fprintf(stderr, "Could not allocate memory for image pixels\n");
