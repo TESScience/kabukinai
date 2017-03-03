@@ -1,0 +1,38 @@
+#define COLORS 1
+
+/*
+ * A star has x, y coordinates and an intensity for each color.
+ */
+ 
+typedef struct {
+	float x, y, intensity[ COLORS ];
+	} star;
+
+// Array of arrays of stars (or struct with length)
+
+// int get_neighbor_index(int star_group_metadataX, int star_group_metadataY) {
+//   return star_group_metadataX * BLOCKYDIMENSION + star_group_metadataY + STAR_GROUP_METADATA_OFFSET;
+// }
+
+
+// inline float getPSF(float x, float y, int color) {
+//    return textures[color][x + psf_texture_x_offset][y + psf_texture_y_offset];
+// }
+
+// What does a thread process?
+//   // Associated with a single pixel, blockID.x identifies neighborhood
+//    int pixel_x = blockID.x * BLOCKXDIMENSION + threadId.x;
+//    int pixel_y = blockID.y * BLOCKYDIMENSION + threadId.x;
+//    int pixel_coordinate = pixel_x * pixel_y_dimension + pixel_y
+//    for(int start_group_metadataX = blockID.x - 1; star_group_metadaaX =< blockID.x + 1 ; ++start_group_metadataX) {
+//      for(int start_group_metadataY = blockID.y - 1; star_group_metadaaY =< blockID.y + 1 ; ++start_group_metadataY) {
+//       int neighborhood_index = get_neighborhood_index(star_group_metadataX, star_group_metadataY);
+//       int star_group_start = star_group_metadata[neighborhood_index];
+//       int star_group_end = star_group_metadata[neighborhood_index+1];
+//       for (int star_index = star_group_start; star_index < star_group_end; ++star_index) {
+//         star star_data = stars[star_index];
+//         for (int color = 0 ; color < COLORS; ++color) 
+//            pixel[pixel_coordinate] +=  star_data.intensity[color] * getPSF(star_data.x - pixel_x, star_data.y - pixel_y, color);
+//       }
+//     }
+//  }

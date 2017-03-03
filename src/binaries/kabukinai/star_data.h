@@ -18,26 +18,32 @@ typedef struct {
 } star;
 
 typedef struct {
-	long count;
-	star * stars;
-} star_array;
+	long min, max;
+} minmax;
 
-int parse_star_array_tsv(star_array *stars, const char * file_name);
-void star_array_release(star_array *stars);
+typedef struct {
+	long x_dimension, y_dimension;
+} dimensions;
+
+typedef star_metadata {
+	dimensions single_panel_pixel_dimensions; // Size of a single panel in pixels, for debugging
+	dimensions panel_indexes_dimensions;
+	minmax x_pixels;
+	minmax y_pixels;
+} star_meta_data;
 
 /*
  * Star data has an array of stars, organized into groups of panels, and an array of panel indexes
  */
 typedef struct {
-	star_array array;
+	star * stars;
 	/* panel_indexes has (panel_indexes_dimensions[0] * panel_indexes_dimensions[1] + 1) elements 
 	 * the final element is number of elements in the star array in data. */
 	long * panel_indexes; 
-	long single_panel_pixel_dimensions[2]; // Size of a single panel in pixels, for debugging
-	long panel_indexes_dimensions[2];
+	star_meta_data metadata;
 } star_data;
 
-int star_data_init(star_data * star_data, star_array star_array);
+int parse_star_data_from_tsv(star_data *data, const char * file_name);
 void star_data_release(star_data data);
 
 #ifdef __cplusplus
