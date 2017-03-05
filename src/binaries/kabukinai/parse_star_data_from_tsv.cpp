@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-std::vector<star> parse_star_vector_from_tsv(star_array *array, const char * file_name) {
+std::vector<star> parse_star_vector_from_tsv( const char * file_name) {
 	// TODO: Handle failure
 	std::ifstream infile(file_name);
 	std::vector<star> star_vector;
@@ -33,7 +33,7 @@ std::vector<star> parse_star_vector_from_tsv(star_array *array, const char * fil
 	return star_vector;
 }
 
-long panel_index_lookup(const long x, const long y, const long panel_indexes_dimensions[2]) {
+long panel_index_lookup(const long x, const long y, const dimensions panel_indexes_dimensions) {
 	return x * panel_indexes_dimensions.y_dimension + y;
 }
 
@@ -46,15 +46,15 @@ int star_data_from_vector(star_data * data,
 	const long x_dimension = x_pixels.max - x_pixels.min;
 	const long y_dimension = y_pixels.max - y_pixels.min;
 	// TODO: error if not evenly divisible by panels_per_side
-	const long single_panel_pixel_dimensions = {
+	const dimensions single_panel_pixel_dimensions = {
 		x_dimension / panels_per_side,
 		y_dimension / panels_per_side,
 	};
-	const long panel_indexes_dimensions = {panels_per_side, panels_per_side};
-	star_data -> metadata.x_pixels = x_pixels;
-	star_data -> metadata.y_pixels = y_pixels;
-	star_data -> metadata.single_panel_pixel_dimensions = single_panel_pixel_dimensions;
-	star_data -> metadata.panel_indexes_dimensions = panel_indexes_dimensions;
+	const dimensions panel_indexes_dimensions = {panels_per_side, panels_per_side};
+	data -> metadata.x_pixels = x_pixels;
+	data -> metadata.y_pixels = y_pixels;
+	data -> metadata.single_panel_pixel_dimensions = single_panel_pixel_dimensions;
+	data -> metadata.panel_indexes_dimensions = panel_indexes_dimensions;
 	std::vector<star> panel_intermediate_data[panels_per_side * panels_per_side];
 	for (auto &some_star : stars) {
 		const long bin_x = ((some_star -> x) - x_pixels.min) / panels_per_side;
