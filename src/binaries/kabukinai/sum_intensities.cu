@@ -1,4 +1,5 @@
 # include "star_data.h"
+#include "stdbool.h"
 
 /*
  * A block is associated with the panels that contain stars that
@@ -12,15 +13,15 @@
  * Indicate whether the block is has an associated panel numbered i.
  */
 
-inline bool block_has_panel( int i ){
-	return FALSE;	/* STUB */
+__device__ inline bool block_has_panel( int i ){
+	return false;	/* STUB */
 }
 
 /*
  * Return the number of stars in panel i.
  */
 
-inline int number_of_stars_in_panel( int i ){
+__device__ inline int number_of_stars_in_panel( int i ){
 	return 0;	/* STUB */
 }
 
@@ -28,7 +29,7 @@ inline int number_of_stars_in_panel( int i ){
  * Return a pointer to the stars in panel i.
  */
 
-inline star *array_of_stars_in_panel( int i ){
+__device__ inline star *array_of_stars_in_panel( int i ){
 	return NULL;	/* STUB */
 }
 
@@ -41,7 +42,7 @@ inline star *array_of_stars_in_panel( int i ){
  * Get the PSF amplitude at the thread's pixel for the star at x, y.
  */
 
-inline float cu_psf( float x, float y, int color ) {
+__device__ inline float cu_psf( float x, float y, int color ) {
 	return 0.0;	/* STUB */
 }
 
@@ -49,7 +50,7 @@ inline float cu_psf( float x, float y, int color ) {
  * Set the thread's pixel value in the output image.
  */
 
-inline void set_pixel_in_raster( float my_pixel ){
+__device__ inline void set_pixel_in_raster( float my_pixel ){
 	return;		/* STUB */
 }
 
@@ -57,14 +58,15 @@ inline void set_pixel_in_raster( float my_pixel ){
 __global__ void sum_intensities_for_pixel( ) {
 	
 	float my_pixel = 0.0;	/* This thread's pixel value */
-	
+	int i, j, color;
+
 	for( i = 0; block_has_panel( i ); i += 1){
-		number_of_stars = number_of_stars_in_panel( i );
-		star * vector_of_stars = array_of_stars_in_panel( i );
+		int number_of_stars = number_of_stars_in_panel( i );
+		star * starp = array_of_stars_in_panel( i );
 		for( j = 0; j < number_of_stars; j += 1 ){
 			for( color = 0; color < STAR_COLORS; color += 1){
-				my_pixel += star->intensties[color] *
-					cu_psf( star->x, star->y, color );
+				my_pixel += starp->intensities[color] *
+					cu_psf( starp->x, starp->y, color );
 			}
 		}
 	}

@@ -25,7 +25,7 @@ typedef struct {
 	long x_dimension, y_dimension;
 } dimensions;
 
-typedef star_metadata {
+typedef struct {
 	dimensions single_panel_pixel_dimensions; // Size of a single panel in pixels, for debugging
 	dimensions panel_indexes_dimensions;
 	minmax x_pixels;
