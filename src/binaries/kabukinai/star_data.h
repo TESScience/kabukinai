@@ -32,6 +32,13 @@ typedef struct {
     minmax y_pixels;
 } star_meta_data;
 
+#ifdef __NVCC__
+__host__ __device__
+#endif
+inline unsigned long panel_index_lookup(const unsigned long x, const unsigned long y, const dimensions panel_indexes_dimensions) {
+    return x * panel_indexes_dimensions.y_dimension + y;
+}
+
 /*
  * Star data has an array of stars, organized into groups of panels, and an array of panel indexes
  */
