@@ -160,8 +160,8 @@ Here x,y,z, and w are the number of bits for each dimension
  * Run the kernel. Note that we don't have to tell it sizes
  * of things in the args, as those are implied by the block dimensions.
  */
-	
-	try_interpolation<<< 1, make_dim3( height, width ) >>>
+	dim3 blocks_dimension( height, width );
+	try_interpolation<<< 1, blocks_dimension  >>>
 		( output );
 	code = cudaDeviceSynchronize();
 	if( code ) {
