@@ -1,4 +1,4 @@
-#include "star_data.h"
+#include "../../libraries/star_data/star_data.h"
 #include "stdbool.h"
 
 /*
