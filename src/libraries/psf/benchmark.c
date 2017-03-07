@@ -3,7 +3,7 @@
 #include "psf.h"
 #include <time.h>
 
-int main(int argc, const char *argv[]) {
+int main() {
     const double start_time = (double) clock() / CLOCKS_PER_SEC;
     double total = 0;
     srand(0);

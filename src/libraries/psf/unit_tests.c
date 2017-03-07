@@ -2,7 +2,7 @@
 #include <assert.h>
 #include "psf.h"
 
-int main(int argc, const char *argv[]) {
+int main() {
     assert(cauchy_psf(1, 1, 1) - 0.032386458927594 < 0.0000000000001);
     assert((cauchy_psf(4817.016309842693, -1866.4796846750432, -9925.589653575564) - (-1.1275748751464823e-9)) <
            0.0000000000001);
