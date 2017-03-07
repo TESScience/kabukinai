@@ -1,8 +1,6 @@
 #include "star_data.h"
 #include <fstream>
 #include <vector>
-#include <stdlib.h>
-
 
 class ParseStarDataException : public std::exception {
 public:
@@ -15,12 +13,6 @@ public:
     explicit ParseStarDataException(const char *message) :
             msg_(message) {
     }
-
-    /** Constructor (C++ STL strings).
-     *  @param message The error message.
-     */
-    explicit ParseStarDataException(const std::string &message) :
-            msg_(message) {}
 
     /** Destructor.
      * Virtual to allow for subclassing.
@@ -70,10 +62,6 @@ std::vector<star> parse_star_vector_from_tsv(const char *file_name) {
     return star_vector;
 }
 
-unsigned long panel_index_lookup(const unsigned long x, const unsigned long y, const dimensions panel_indexes_dimensions) {
-    return x * panel_indexes_dimensions.y_dimension + y;
-}
-
 int star_data_from_vector(star_data *data,
                           const std::vector<star> stars,
                           const minmax x_pixels,
@@ -90,7 +78,8 @@ int star_data_from_vector(star_data *data,
     data->metadata.panel_indexes_dimensions.y_dimension = panels_per_side;
     data->metadata.x_pixels = x_pixels;
     data->metadata.y_pixels = y_pixels;
-    const unsigned long number_of_panels = (unsigned long) (panels_per_side * panels_per_side);
+    // TODO: error on negative
+    const unsigned long number_of_panels = (const unsigned long) (panels_per_side * panels_per_side);
     std::vector<std::vector<star>> panel_intermediate_data(number_of_panels);
     for (const star &some_star : stars) {
         // TODO: Error if star out of bounds
@@ -103,7 +92,7 @@ int star_data_from_vector(star_data *data,
     data->stars = (star *) calloc(sizeof(star), stars.size());
     data->panel_indexes[number_of_panels] = stars.size();
     long panel_index = 0;
-    for (int i = 0; i < number_of_panels; ++i) {
+    for (unsigned long i = 0; i < number_of_panels; ++i) {
         data->panel_indexes[i] = panel_index;
         std::copy(panel_intermediate_data[i].begin(), panel_intermediate_data[i].end(), data->stars + panel_index);
         panel_index = panel_index + panel_intermediate_data[i].size();
