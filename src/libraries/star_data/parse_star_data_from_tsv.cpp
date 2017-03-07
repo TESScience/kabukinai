@@ -62,13 +62,6 @@ std::vector<star> parse_star_vector_from_tsv(const char *file_name) {
     return star_vector;
 }
 
-<<<<<<< HEAD:src/libraries/star_data/parse_star_data_from_tsv.cpp
-=======
-unsigned long panel_index_lookup(const unsigned long x, const unsigned long y, const dimensions panel_indices_dimensions) {
-    return x * panel_indices_dimensions.y_dimension + y;
-}
-
->>>>>>> d1d3eef1bb2fbce77376febc7249f8ea7befdb6c:src/binaries/kabukinai/parse_star_data_from_tsv.cpp
 int star_data_from_vector(star_data *data,
                           const std::vector<star> stars,
                           const minmax x_pixels,
@@ -99,13 +92,8 @@ int star_data_from_vector(star_data *data,
     data->stars = (star *) calloc(sizeof(star), stars.size());
     data->panel_indices[number_of_panels] = stars.size();
     long panel_index = 0;
-<<<<<<< HEAD:src/libraries/star_data/parse_star_data_from_tsv.cpp
     for (unsigned long i = 0; i < number_of_panels; ++i) {
-        data->panel_indexes[i] = panel_index;
-=======
-    for (int i = 0; i < number_of_panels; ++i) {
         data->panel_indices[i] = panel_index;
->>>>>>> d1d3eef1bb2fbce77376febc7249f8ea7befdb6c:src/binaries/kabukinai/parse_star_data_from_tsv.cpp
         std::copy(panel_intermediate_data[i].begin(), panel_intermediate_data[i].end(), data->stars + panel_index);
         panel_index = panel_index + panel_intermediate_data[i].size();
     }
