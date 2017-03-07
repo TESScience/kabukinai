@@ -27,7 +27,7 @@ typedef struct {
 
 typedef struct {
     dimensions single_panel_pixel_dimensions; // Size of a single panel in pixels, for debugging
-    dimensions panel_indexes_dimensions;
+    dimensions panel_indices_dimensions;
     minmax x_pixels;
     minmax y_pixels;
 } star_meta_data;
@@ -35,18 +35,18 @@ typedef struct {
 #ifdef __NVCC__
 __host__ __device__
 #endif
-inline unsigned long panel_index_lookup(const unsigned long x, const unsigned long y, const dimensions panel_indexes_dimensions) {
-    return x * panel_indexes_dimensions.y_dimension + y;
+inline long panel_index_lookup(const long x, const long y, const dimensions panel_indices_dimensions) {
+    return x * panel_indices_dimensions.y_dimension + y;
 }
 
 /*
- * Star data has an array of stars, organized into groups of panels, and an array of panel indexes
+ * Star data has an array of stars, organized into groups of panels, and an array of panel indices
  */
 typedef struct {
     star *stars;
-    /* panel_indexes has (panel_indexes_dimensions[0] * panel_indexes_dimensions[1] + 1) elements
+    /* panel_indices has (panel_indices_dimensions[0] * panel_indices_dimensions[1] + 1) elements
      * the final element is number of elements in the star array in data. */
-    long *panel_indexes;
+    long *panel_indices;
     star_meta_data metadata;
 } star_data;
 
