@@ -1,8 +1,7 @@
 #include <stdio.h>
 
 /*
- * to be image-ish, we'll use height or y as the first coordinate,
- * width or x as the second in this code.
+ * TODO make comment regarding matrix orientation versus image coordinates.
  */
 
 /*
@@ -29,7 +28,7 @@ __global__ void try_interpolation( float *output ) {
 
 int main()
 {
-	int code;
+	cudaError_t code;
 
 /*
  * Make a 2d test pattern as an ordinary C array.
@@ -58,14 +57,30 @@ int main()
 	printf( "\n" );
 
 /*
- * I have no idea where "channel" comes from, but
- * a cudaChannelFormatDesc is a structure that defines the
+ * A cudaChannelFormatDesc is a structure that defines the
  * contents of an element of a cudaArray. Such an element can contain
  * up to four numbers. cudaCreateChannelDesc() allows you to specify the 
  * length of each of the four in bits (!) along with a type category
  * common to all. So, this complicated call defines an ordinaly scalar
  * float as an array element.
  */
+
+/*
+ * A cudaChannelFormatDesc is a structure that defines the
+ * contents of an element of a cudaArray.
+ * 
+ * An element of a cudaArray has up to four numbers of variable length.
+ * 
+ * struct cudaChannelFormatDesc {
+ *    int x, y, z, w;
+ *    enum cudaChannelFormatKind  f;
+ * }
+
+It is constructed with a function `cudaCreateChannelDesc`
+cudaCreateChannelDesc(int x, int y, int z, int w, enum cudaChannelFormatKind  f) ;
+
+Here x,y,z, and w are the number of bits for each dimension
+*/
  
 	const cudaChannelFormatDesc floatDesc = 
 		cudaCreateChannelDesc(32, 0, 0, 0,
@@ -73,7 +88,6 @@ int main()
 
 /*
  * A cudaArray is an array of objects defined by a cudaChannelFormatDesc.
- * Obviously ;-)
  * Allocate one of these on the device.
  */
  
