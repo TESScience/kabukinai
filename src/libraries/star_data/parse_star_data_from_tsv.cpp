@@ -1,6 +1,7 @@
 #include "star_data.h"
 #include <fstream>
 #include <vector>
+#include <math.h>
 
 class ParseStarDataException : public std::exception {
 public:
@@ -64,29 +65,26 @@ std::vector<star> parse_star_vector_from_tsv(const char *file_name) {
 
 int star_data_from_vector(star_data *data,
                           const std::vector<star> stars,
-                          const minmax x_pixels,
-                          const minmax y_pixels,
-                          const long panels_per_side) {
-    // TODO: error on negative
-    // TODO: error if not evenly divisible by panels_per_side
-    const long x_dimension = x_pixels.max - x_pixels.min;
-    const long y_dimension = y_pixels.max - y_pixels.min;
+                          const dimensions image_dimensions,
+                          const dimensions single_panel_pixel_dimensions) {
 
-    data->metadata.single_panel_pixel_dimensions.x_dimension = x_dimension / panels_per_side;
-    data->metadata.single_panel_pixel_dimensions.y_dimension = y_dimension / panels_per_side;
-    data->metadata.panel_indices_dimensions.x_dimension = panels_per_side;
-    data->metadata.panel_indices_dimensions.y_dimension = panels_per_side;
-    data->metadata.x_pixels = x_pixels;
-    data->metadata.y_pixels = y_pixels;
     // TODO: error on negative
-    const unsigned long number_of_panels = (const unsigned long) (panels_per_side * panels_per_side);
+    data->metadata.single_panel_pixel_dimensions = single_panel_pixel_dimensions;
+    data->metadata.image_dimensions = image_dimensions;
+    data->metadata.panel_indices_dimensions.x_dimension =
+            (int) ceil(image_dimensions.x_dimension / single_panel_pixel_dimensions.x_dimension + 2);
+    data->metadata.panel_indices_dimensions.y_dimension =
+            (int) ceil(image_dimensions.y_dimension / single_panel_pixel_dimensions.y_dimension + 2);
+
+    const unsigned long number_of_panels = (const unsigned long) (data->metadata.panel_indices_dimensions.x_dimension *
+                                                                  data->metadata.panel_indices_dimensions.y_dimension);
+
     std::vector<std::vector<star>> panel_intermediate_data(number_of_panels);
-    for (const star &some_star : stars) {
+    for (const star &star_data : stars) {
         // TODO: Error if star out of bounds
-        const unsigned long bin_x = (const unsigned long) (((some_star.x) - x_pixels.min) / panels_per_side);
-        const unsigned long bin_y = (const unsigned long) (((some_star.y) - y_pixels.min) / panels_per_side);
-        panel_intermediate_data.at(panel_index_lookup(bin_x, bin_y, data->metadata.panel_indices_dimensions)).push_back(
-                some_star);
+        panel_intermediate_data.at(
+                (unsigned long) panel_index_lookup(star_data.x, star_data.y, data->metadata)).push_back(
+                star_data);
     }
     data->panel_indices = (long *) calloc(sizeof(long), number_of_panels + 1);
     data->stars = (star *) calloc(sizeof(star), stars.size());
@@ -104,9 +102,9 @@ int star_data_from_vector(star_data *data,
 extern "C" {
 int parse_star_data_from_tsv(star_data *data,
                              const char *file_name,
-                             const minmax x_pixels,
-                             const minmax y_pixels,
-                             const long panels_per_side) {
-    return star_data_from_vector(data, parse_star_vector_from_tsv(file_name), x_pixels, y_pixels, panels_per_side);
+                             const dimensions image_dimensions,
+                             const dimensions single_panel_pixel_dimensions) {
+    return star_data_from_vector(data, parse_star_vector_from_tsv(file_name), image_dimensions,
+                                 single_panel_pixel_dimensions);
 }
 }
