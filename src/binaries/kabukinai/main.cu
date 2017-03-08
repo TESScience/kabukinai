@@ -15,12 +15,13 @@ texture<float, cudaTextureType2D, cudaReadModeElementType> myTexture;
 
 __global__ void try_interpolation( float *output ) {
 
-/*
- * Distort our image to test interpolation and clipping.
- */
-	
-	float y = threadIdx.y * 0.75 - 0.5;
-	float x = threadIdx.x *0.5;
+// This version is the identity. Have to offset by 0.5 to get the center of the texel	
+//	float y = threadIdx.y + 0.5 ; 
+//	float x = threadIdx.x + 0.5 ;
+
+      float y = threadIdx.y + 1.0 ; 
+      float x = threadIdx.x + 1.0 ;
+
 	
 	output[ threadIdx.y * blockDim.x + threadIdx.x ] =
 		tex2D( myTexture, y, x );
