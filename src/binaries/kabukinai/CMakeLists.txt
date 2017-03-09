@@ -3,4 +3,4 @@ SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS})
 
 SET(CUDA_SRCS main.cu sum_intensities.cu)
 CUDA_ADD_EXECUTABLE(kabukinai ${CUDA_SRCS})
-TARGET_LINK_LIBRARIES(kabukinai cfitsio libargparse libstardata)
+TARGET_LINK_LIBRARIES(kabukinai cfitsio libargparse libstar_data)

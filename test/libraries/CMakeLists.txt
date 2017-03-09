@@ -1,1 +1,2 @@
 ADD_SUBDIRECTORY(psf)
+ADD_SUBDIRECTORY(star_data)
