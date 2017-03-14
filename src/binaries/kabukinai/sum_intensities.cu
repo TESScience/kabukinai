@@ -1,5 +1,6 @@
 #include "../../libraries/star_data/star_data.h"
-#include "stdbool.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 // Texture reference, local to this file
 
@@ -23,7 +24,7 @@ __host__ void setup_psf_texture( int height, int width, float *data) {
 	code = cudaMalloc3DArray(&floatArray, &floatDesc,
 		 make_cudaExtent( height, width, STAR_COLORS ), 0);
 	if( code ) {
-		printf( "cudaMalloc3DArray: %s\n",
+		fprintf( stderr, "cudaMalloc3DArray: %s\n",
 			cudaGetErrorString(code));
 			exit( 1 );
 	}
@@ -34,7 +35,7 @@ __host__ void setup_psf_texture( int height, int width, float *data) {
 	code = cudaMemcpyToArray(floatArray, 0, 0, data, size,
 		cudaMemcpyHostToDevice);
 	if( code ) {
-		printf( "cudaMemcpyToArray: %s\n",
+		fprintf( stderr, "cudaMemcpyToArray: %s\n",
 			cudaGetErrorString(code));
 		exit( 1 );
 	}
@@ -57,7 +58,7 @@ __host__ void setup_psf_texture( int height, int width, float *data) {
 		
 	code = cudaBindTextureToArray(psf_texture, floatArray, floatDesc);
 	if( code ) {
-		printf( "cudaBindTextureToArray: %s\n",
+		fprintf( stderr, "cudaBindTextureToArray: %s\n",
 			cudaGetErrorString(code));
 		exit( 1 );
 	}
@@ -67,9 +68,9 @@ __host__ void setup_psf_texture( int height, int width, float *data) {
 // center of the PSF
 
 __device__ inline float cu_psf(float x, float y, int color) {
-	float norm_x = x / blockDim.x + 0.5;
-	float norm_y = y / blockDim.y + 0.5;
-	return tex2DLayered(psf_texture, norm_x, norm_y, color );
+    float norm_x = x / blockDim.x + 0.5;
+    float norm_y = y / blockDim.y + 0.5;
+    return tex2DLayered(psf_texture, norm_x, norm_y, color);
 }
 
 
@@ -89,8 +90,9 @@ sum_intensities_for_pixel(float *pixel, const star *stars, int *panel_indices, c
             for (int star_index = panel_start; star_index < panel_end; ++star_index) {
                 const star star_data = stars[star_index];
                 for (int color = 0; color < STAR_COLORS; ++color)
-                   my_pixel +=
-                            star_data.intensities[color] * cu_psf(star_data.x - pixel_x, star_data.y - pixel_y, color);
+                    my_pixel +=
+                            star_data.intensities[color] *
+                            cu_psf(star_data.point.x - pixel_x, star_data.point.y - pixel_y, color);
             }
         }
     }

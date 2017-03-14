@@ -8,18 +8,18 @@ extern "C" {
 #endif
 
 #define KABUKINAI_STAR_DATA_SUCCESS 0
-#define KABUKINAI_STAR_DATA_FAILURE 1
+
+typedef struct {
+    float x, y;
+} point_2d;
 
 /*
  * A star has x, y coordinates and an intensity for each star color.
  */
 typedef struct {
-    float x, y, intensities[STAR_COLORS];
+    point_2d point;
+    float intensities[STAR_COLORS];
 } star;
-
-typedef struct {
-    int min, max;
-} minmax;
 
 typedef struct {
     int x_dimension, y_dimension;
@@ -35,12 +35,23 @@ typedef struct {
 __host__ __device__
 #endif
 
-inline int panel_index_lookup(const float x, const float y, const star_meta_data metadata) {
-    const float panel_x = x / metadata.single_panel_pixel_dimensions.x_dimension + 1;
-    if (panel_x < 0 || panel_x >= metadata.panel_indices_dimensions.x_dimension) return -1;
-    const float panel_y = y / metadata.single_panel_pixel_dimensions.y_dimension + 1;
-    if (panel_y < 0 || panel_y >= metadata.panel_indices_dimensions.y_dimension) return -1;
-    return ((int) y) * metadata.panel_indices_dimensions.x_dimension + ((int) x);
+inline point_2d compute_panel_2d_indices(const float x, const float y, const star_meta_data meta_data) {
+    point_2d point;
+    point.x = x / meta_data.single_panel_pixel_dimensions.x_dimension + 1;
+    point.y = y / meta_data.single_panel_pixel_dimensions.y_dimension + 1;
+    return point;
+}
+
+#ifdef __NVCC__
+__host__ __device__
+#endif
+
+inline int panel_index_lookup(const float x, const float y, const star_meta_data meta_data) {
+    const point_2d panel_indices = compute_panel_2d_indices(x, y, meta_data);
+    if (panel_indices.x < 0 || panel_indices.x >= meta_data.panel_indices_dimensions.x_dimension ||
+        panel_indices.y < 0 || panel_indices.y >= meta_data.panel_indices_dimensions.y_dimension)
+        return -1;
+    return ((int) panel_indices.y) * meta_data.panel_indices_dimensions.x_dimension + ((int) panel_indices.x);
 }
 
 /*
@@ -51,7 +62,7 @@ typedef struct {
     /* panel_indices has (panel_indices_dimensions[0] * panel_indices_dimensions[1] + 1) elements
      * the final element is number of elements in the star array in data. */
     long *panel_indices;
-    star_meta_data metadata;
+    star_meta_data meta_data;
 } star_data;
 
 int parse_star_data_from_tsv(star_data *data,
