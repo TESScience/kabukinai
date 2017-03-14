@@ -20,16 +20,17 @@ __host__ void setup_psf_texture( int height, int width, float *data) {
 	// Make an array to hold the texture on the device
 
 	cudaArray* floatArray;
-	code = cudaMallocArray(&floatArray, &floatDesc, height, width);
+	code = cudaMalloc3DArray(&floatArray, &floatDesc,
+		 make_cudaExtent( height, width, STAR_COLORS ), 0);
 	if( code ) {
-		printf( "cudaMallocArray: %s\n",
+		printf( "cudaMalloc3DArray: %s\n",
 			cudaGetErrorString(code));
 			exit( 1 );
 	}
 	
 	// Copy the data to the array
 	
-	size_t size = height * width * sizeof( float );
+	size_t size = height * width * STAR_COLORS * sizeof( float );
 	code = cudaMemcpyToArray(floatArray, 0, 0, data, size,
 		cudaMemcpyHostToDevice);
 	if( code ) {
