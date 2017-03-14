@@ -1,5 +1,6 @@
 #include "../../libraries/star_data/star_data.h"
-#include "stdbool.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 // Texture reference, local to this file
 
@@ -7,68 +8,68 @@ texture<float, cudaTextureType2DLayered, cudaReadModeElementType> psf_texture;
 
 // Call this function to make the texture from a C data array
 
-__host__ void setup_psf_texture( int height, int width, float *data) {
-	
-	cudaError_t code;
+__host__ void setup_psf_texture(int height, int width, float *data) {
 
-	// Make the type definition for a single float element
-	
-	const cudaChannelFormatDesc floatDesc = 
-		cudaCreateChannelDesc(32, 0, 0, 0,
-		cudaChannelFormatKindFloat );
-	
-	// Make an array to hold the texture on the device
+    cudaError_t code;
 
-	cudaArray* floatArray;
-	code = cudaMallocArray(&floatArray, &floatDesc, height, width);
-	if( code ) {
-		printf( "cudaMallocArray: %s\n",
-			cudaGetErrorString(code));
-			exit( 1 );
-	}
-	
-	// Copy the data to the array
-	
-	size_t size = height * width * sizeof( float );
-	code = cudaMemcpyToArray(floatArray, 0, 0, data, size,
-		cudaMemcpyHostToDevice);
-	if( code ) {
-		printf( "cudaMemcpyToArray: %s\n",
-			cudaGetErrorString(code));
-		exit( 1 );
-	}
-	
-	// Return zero for accesses outside the PSF texture
-	
-	psf_texture.addressMode[0] = cudaAddressModeBorder;
-	psf_texture.addressMode[1] = cudaAddressModeBorder;
-	
-	// Interpolate between samples
-	
-	psf_texture.filterMode = cudaFilterModeLinear;
+    // Make the type definition for a single float element
 
-	// Use [0,1] as the coordinate limits of the texture.
-	// This means cu_psf need not pay attention to oversampling.
-	
-	psf_texture.normalized = true;
+    const cudaChannelFormatDesc floatDesc =
+            cudaCreateChannelDesc(32, 0, 0, 0,
+                                  cudaChannelFormatKindFloat);
 
-	// Bind the texture to its data
-		
-	code = cudaBindTextureToArray(psf_texture, floatArray, floatDesc);
-	if( code ) {
-		printf( "cudaBindTextureToArray: %s\n",
-			cudaGetErrorString(code));
-		exit( 1 );
-	}
+    // Make an array to hold the texture on the device
+
+    cudaArray *floatArray;
+    code = cudaMallocArray(&floatArray, &floatDesc, height, width);
+    if (code) {
+        fprintf(stderr, "cudaMallocArray: %s\n",
+                cudaGetErrorString(code));
+        exit(EXIT_FAILURE);
+    }
+
+    // Copy the data to the array
+
+    size_t size = height * width * sizeof(float);
+    code = cudaMemcpyToArray(floatArray, 0, 0, data, size,
+                             cudaMemcpyHostToDevice);
+    if (code) {
+        printf("cudaMemcpyToArray: %s\n",
+               cudaGetErrorString(code));
+        exit(1);
+    }
+
+    // Return zero for accesses outside the PSF texture
+
+    psf_texture.addressMode[0] = cudaAddressModeBorder;
+    psf_texture.addressMode[1] = cudaAddressModeBorder;
+
+    // Interpolate between samples
+
+    psf_texture.filterMode = cudaFilterModeLinear;
+
+    // Use [0,1] as the coordinate limits of the texture.
+    // This means cu_psf need not pay attention to oversampling.
+
+    psf_texture.normalized = true;
+
+    // Bind the texture to its data
+
+    code = cudaBindTextureToArray(psf_texture, floatArray, floatDesc);
+    if (code) {
+        printf("cudaBindTextureToArray: %s\n",
+               cudaGetErrorString(code));
+        exit(1);
+    }
 }
 
 // Get the PSF amplitude at pixel coordinates x, y relative to the 
 // center of the PSF
 
 __device__ inline float cu_psf(float x, float y, int color) {
-	float norm_x = x / blockDim.x + 0.5;
-	float norm_y = y / blockDim.y + 0.5;
-	return tex2DLayered(psf_texture, norm_x, norm_y, color );
+    float norm_x = x / blockDim.x + 0.5;
+    float norm_y = y / blockDim.y + 0.5;
+    return tex2DLayered(psf_texture, norm_x, norm_y, color);
 }
 
 
@@ -88,8 +89,9 @@ sum_intensities_for_pixel(float *pixel, const star *stars, int *panel_indices, c
             for (int star_index = panel_start; star_index < panel_end; ++star_index) {
                 const star star_data = stars[star_index];
                 for (int color = 0; color < STAR_COLORS; ++color)
-                   my_pixel +=
-                            star_data.intensities[color] * cu_psf(star_data.x - pixel_x, star_data.y - pixel_y, color);
+                    my_pixel +=
+                            star_data.intensities[color] *
+                            cu_psf(star_data.point.x - pixel_x, star_data.point.y - pixel_y, color);
             }
         }
     }
