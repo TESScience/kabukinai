@@ -11,7 +11,7 @@ ADD_CUSTOM_COMMAND(
 
 SET(parse_star_data_tsv_SOURCES parse_star_data_tsv.c star_data.h)
 ADD_EXECUTABLE(parse_star_data_tsv ${parse_star_data_tsv_SOURCES})
-TARGET_LINK_LIBRARIES(parse_star_data_tsv libstar_data)
+TARGET_LINK_LIBRARIES(parse_star_data_tsv star_data)
 
 
 ADD_CUSTOM_TARGET(test_parse_star_data
