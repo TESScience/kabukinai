@@ -7,7 +7,7 @@
 #define PANIC_ON_BAD_FITSIO_STATUS(error_message, status) { \
 	const int status_value = (status); \
 	if (status_value != 0) { \
-		fprintf(stderr, "KABUKINAI_PSF_FAILURE: %s", (error_message)); \
+		fprintf(stderr, "KABUKINAI_PSF_FAILURE: %s at line %d in file %s\n", (error_message), __LINE__, __FILE__); \
 		fits_report_error(stderr, status_value); \
 		return KABUKINAI_PSF_FAILURE; \
 	} \

@@ -79,7 +79,7 @@ int star_data_from_vector(star_data *data,
     const unsigned long number_of_panels = (const unsigned long) (meta_data.panel_indices_dimensions.x_dimension *
                                                                   meta_data.panel_indices_dimensions.y_dimension);
 
-    std::vector<std::vector<star>> panel_intermediate_data(number_of_panels);
+    std::vector< std::vector< star > > panel_intermediate_data(number_of_panels);
     for (const star &star_data : stars) {
         const int panel_index = panel_index_lookup(star_data.point.x, star_data.point.y, meta_data);
         if (panel_index < 0) {
@@ -101,10 +101,10 @@ int star_data_from_vector(star_data *data,
         }
         panel_intermediate_data.at((unsigned long) panel_index).push_back(star_data);
     }
-    data->panel_indices = (long *) calloc(sizeof(long), number_of_panels + 1);
+    data->panel_indices = (int *) calloc(sizeof(int), number_of_panels + 1);
     data->stars = (star *) calloc(sizeof(star), stars.size());
     data->panel_indices[number_of_panels] = stars.size();
-    long panel_index = 0;
+    int panel_index = 0;
     for (unsigned long i = 0; i < number_of_panels; ++i) {
         data->panel_indices[i] = panel_index;
         std::copy(panel_intermediate_data[i].begin(), panel_intermediate_data[i].end(), data->stars + panel_index);

@@ -51,7 +51,7 @@ inline int panel_index_lookup(const float x, const float y, const star_meta_data
     if (panel_indices.x < 0 || panel_indices.x >= meta_data.panel_indices_dimensions.x_dimension ||
         panel_indices.y < 0 || panel_indices.y >= meta_data.panel_indices_dimensions.y_dimension)
         return -1;
-    return ((int) panel_indices.y) * meta_data.panel_indices_dimensions.x_dimension + ((int) panel_indices.x);
+    return panel_indices.y * meta_data.panel_indices_dimensions.x_dimension + panel_indices.x;
 }
 
 /*
@@ -59,11 +59,22 @@ inline int panel_index_lookup(const float x, const float y, const star_meta_data
  */
 typedef struct {
     star *stars;
+
     /* panel_indices has (panel_indices_dimensions[0] * panel_indices_dimensions[1] + 1) elements
      * the final element is number of elements in the star array in data. */
-    long *panel_indices;
+    int *panel_indices;
+
+    
     star_meta_data meta_data;
 } star_data;
+
+inline int number_of_panel_indices(const star_data data) {
+	return data.meta_data.panel_indices_dimensions.x_dimension * data.meta_data.panel_indices_dimensions.y_dimension + 1;
+}
+
+inline int number_of_stars(const star_data data) {
+	return data.panel_indices[number_of_panel_indices(data) - 1];
+}
 
 int parse_star_data_from_tsv(star_data *data,
                              const char *file_name,
