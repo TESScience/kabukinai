@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "star_data.h"
 
-int main(const int argc, const char* argv[]) {
+int main(const int argc, const char *argv[]) {
     if (argc < 2) {
         printf("No input file specified\n");
         return EXIT_FAILURE;
@@ -16,6 +16,9 @@ int main(const int argc, const char* argv[]) {
     single_panel_pixel_dimensions.x_dimension = 32;
     single_panel_pixel_dimensions.y_dimension = 32;
     parse_star_data_from_tsv(&data, argv[1], image_dimensions, single_panel_pixel_dimensions);
+    printf("Panel dimensions: %i by %i",
+           data.meta_data.panel_indices_dimensions.x_dimension,
+           data.meta_data.panel_indices_dimensions.y_dimension);
     star_data_release(data);
     return EXIT_SUCCESS;
 }

@@ -71,9 +71,9 @@ int star_data_from_vector(star_data *data,
     data->meta_data.single_panel_pixel_dimensions = single_panel_pixel_dimensions;
     data->meta_data.image_dimensions = image_dimensions;
     data->meta_data.panel_indices_dimensions.x_dimension =
-            (int) ceil(image_dimensions.x_dimension / single_panel_pixel_dimensions.x_dimension + 2);
+            (int) ceil((float) image_dimensions.x_dimension / (float) single_panel_pixel_dimensions.x_dimension + 2);
     data->meta_data.panel_indices_dimensions.y_dimension =
-            (int) ceil(image_dimensions.y_dimension / single_panel_pixel_dimensions.y_dimension + 2);
+            (int) ceil((float) image_dimensions.y_dimension / (float) single_panel_pixel_dimensions.y_dimension + 2);
 
     const star_meta_data &meta_data = data->meta_data;
     const unsigned long number_of_panels = (const unsigned long) (meta_data.panel_indices_dimensions.x_dimension *

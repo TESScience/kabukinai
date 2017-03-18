@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 offset = -16
-panel_height = 66
+panel_height = 65
 panel_width = 66
 stride = 32
 
