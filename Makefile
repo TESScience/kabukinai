@@ -1,6 +1,9 @@
-.PHONY: all build-kabukinai test clean
+.PHONY: all build-kabukinai test_kabukinai test clean
 
 all: build-kabukinai
+
+test_kabukinai: build/ build/Makefile
+	make -C build test_kabukinai
 
 build-kabukinai: build/ build/Makefile
 	make -C $<
