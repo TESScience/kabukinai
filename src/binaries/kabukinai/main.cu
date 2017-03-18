@@ -34,7 +34,7 @@ int main(const int argc, char * argv[])
 
 	float * pixels;
 	PANIC_ON_BAD_CUDA_STATUS(cudaMalloc((void**)&pixels, image_size));
-        PANIC_ON_BAD_CUDA_STATUS(cudaMemset((void**)&pixels, 0, image_size));
+        PANIC_ON_BAD_CUDA_STATUS(cudaMemset((void*)pixels, 0, image_size));
         
 	star * stars;
 	const size_t stars_size = sizeof(star) * number_of_stars(star_data_from_file);
