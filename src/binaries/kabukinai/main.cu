@@ -38,11 +38,28 @@ int main(const int argc, char * argv[])
         
 	star * stars;
 	const size_t stars_size = sizeof(star) * number_of_stars(star_data_from_file);
+	
+	printf("***********number_of_stars = %ld***********\n",
+	 stars_size/sizeof(star)); // DEBUG
+	for( int i = 2000; i < 2010; ++i ) {
+		printf( "**********star %d %f %f %f*********\n",
+			i, 
+			star_data_from_file.stars[i].point.x, 
+			star_data_from_file.stars[i].point.y,
+			star_data_from_file.stars[i].intensities[0]);
+	}
 	PANIC_ON_BAD_CUDA_STATUS(cudaMalloc((void**)&stars, stars_size));
 	PANIC_ON_BAD_CUDA_STATUS(cudaMemcpy(stars, star_data_from_file.stars, stars_size, cudaMemcpyHostToDevice));
 
 	int * panel_indices;
 	const size_t panel_indices_size = sizeof(int) * number_of_panel_indices(star_data_from_file);
+	
+	printf("***********number_of_panel_indices = %ld***********\n", panel_indices_size/sizeof(int)); // DEBUG
+	for( int i = 2000; i < 2010; ++i ) {
+		printf( "**********panel_index %d %d*********\n", i,
+			star_data_from_file.panel_indices[i]);
+	}
+	
 	PANIC_ON_BAD_CUDA_STATUS(cudaMalloc((void**)&panel_indices, panel_indices_size));
 	PANIC_ON_BAD_CUDA_STATUS(cudaMemcpy(
 				panel_indices, 
@@ -50,9 +67,15 @@ int main(const int argc, char * argv[])
 				panel_indices_size, 
 				cudaMemcpyHostToDevice));
 
-	dim3 dgrid(image_dimensions.y_dimension/single_panel_pixel_dimensions.y_dimension,
-			image_dimensions.x_dimension/single_panel_pixel_dimensions.x_dimension);
-	dim3 dblock(single_panel_pixel_dimensions.y_dimension, single_panel_pixel_dimensions.x_dimension);
+//	dim3 dgrid(image_dimensions.y_dimension/single_panel_pixel_dimensions.y_dimension,
+			// image_dimensions.x_dimension/single_panel_pixel_dimensions.x_dimension);
+	
+	dim3 dgrid(1,1);	// DEBUG
+	
+//	dim3 dblock(single_panel_pixel_dimensions.y_dimension, single_panel_pixel_dimensions.x_dimension);
+
+	dim3 dblock(1,1);	// DEBUG
+	
 	sum_intensities_for_pixel<<<dgrid, dblock>>>(pixels, stars, panel_indices, star_data_from_file.meta_data);
 
 

@@ -62,21 +62,44 @@ sum_intensities_for_pixel(float *pixel, const star *stars, int *panel_indices, c
     const int pixel_x = blockIdx.x * blockDim.x + threadIdx.x;
     const int pixel_y = blockIdx.y * blockDim.y + threadIdx.x;
     const int pixel_index = pixel_y * meta_data.image_dimensions.x_dimension + pixel_x;
+    
+    printf( "***********pixel_x = %d, pixel_y = %d***********\n",
+    	pixel_x, pixel_y );
 
-    for (int panel_indexX = blockIdx.x - 1; panel_indexX <= blockIdx.x + 1; ++panel_indexX) {
-        for (int panel_indexY = blockIdx.y - 1; panel_indexY <= blockIdx.y + 1; ++panel_indexY) {
+    for (int panel_indexX = (int) blockIdx.x - 1; panel_indexX <= (int) blockIdx.x + 1; ++panel_indexX) {
+        for (int panel_indexY = (int) blockIdx.y - 1; panel_indexY <= (int) blockIdx.y + 1; ++panel_indexY) {
+	
+	    printf( "*********panel_indexX = %d, panel_indexY = %d***********\n", panel_indexX, panel_indexY);
+	    
             const int neighborhood_index = panel_index_lookup(panel_indexX, panel_indexY, meta_data);
+	    
+	    printf( "***********neighborhood_index = %d*************\n", neighborhood_index );
+	    
             const int panel_start = panel_indices[neighborhood_index];
+	    
+	    printf( "***********panel_start = %d*************\n", panel_start );
+	    
             const int panel_end = panel_indices[neighborhood_index + 1];
+	    
+	    printf( "***********panel_end = %d*************\n", panel_end );
+	    
             for (int star_index = panel_start; star_index < panel_end; ++star_index) {
                 const star star_data = stars[star_index];
-                for (int color = 0; color < STAR_COLORS; ++color)
+                for (int color = 0; color < STAR_COLORS; ++color){
+		
+		    printf( "************intensity = %f***********\n", star_data.intensities[color]);
+		    printf( "************x = %f, y = %f***********\n", star_data.point.x, star_data.point.y);
+		     
                     my_pixel +=
                             star_data.intensities[color] *
                             cu_psf(star_data.point.x - pixel_x, star_data.point.y - pixel_y, color, meta_data);
+	        }
             }
         }
     }
+    
+    printf( "**************my_pixel = %f**************\n", my_pixel);
+    
     pixel[pixel_index] = my_pixel;
 }
 
