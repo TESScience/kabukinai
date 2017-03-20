@@ -49,11 +49,11 @@ __host__ void setup_psf_texture(const int height, const int width, const float *
 }
 
 // Get the PSF amplitude at pixel coordinates x, y relative to the center of the PSF
-#define CU_PSF(x, y, color, meta_data, texture) \
-    tex2DLayered((texture), \
+#define CU_PSF(x, y, color, meta_data, the_texture) \
+    tex2DLayered((the_texture), \
                  (x) / (meta_data).single_panel_pixel_dimensions.x_dimension + 0.5, \
                  (y) / (meta_data).single_panel_pixel_dimensions.y_dimension + 0.5, \
-                 (color));
+                 (color))
 
 __global__ void
 sum_intensities_for_pixel(float *pixel, const star *stars, int *panel_indices, const star_meta_data meta_data) {
@@ -61,8 +61,8 @@ sum_intensities_for_pixel(float *pixel, const star *stars, int *panel_indices, c
     float my_pixel = 0.0;   // This thread's pixel value
     const int pixel_x_coordinate = blockIdx.x * blockDim.x + threadIdx.x;
     const int pixel_y_coordinate = blockIdx.y * blockDim.y + threadIdx.x;
-    const float pixel_x = (float) pixel_x_coordinate;
-    const float pixel_y = (float) pixel_y_coordinate;
+    const float pixel_x = (float) pixel_x_coordinate + 0.5;
+    const float pixel_y = (float) pixel_y_coordinate + 0.5;
 
     printf("***********pixel_x = %g, pixel_y = %g***********\n", pixel_x, pixel_y);
 
@@ -90,6 +90,13 @@ sum_intensities_for_pixel(float *pixel, const star *stars, int *panel_indices, c
 
                     printf("************intensity = %f***********\n", star_data.intensities[color]);
                     printf("************x = %f, y = %f***********\n", star_data.point.x, star_data.point.y);
+                    printf("************pixel x = %f, pixel y = %f***********\n", pixel_x, pixel_y);
+                    printf("************d x = %f, d y = %f***********\n", star_data.point.x-pixel_x, star_data.point.y-pixel_y);
+                    printf("************psf = %f***********\n", CU_PSF(star_data.point.x - pixel_x,
+                                                                     star_data.point.y - pixel_y,
+                                                                     color,
+                                                                     meta_data,
+                                                                     psf_texture));
 
                     my_pixel += star_data.intensities[color] * CU_PSF(star_data.point.x - pixel_x,
                                                                       star_data.point.y - pixel_y,
