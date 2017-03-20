@@ -13,8 +13,8 @@ int main(const int argc, char *argv[]) {
     psf_data point_spread_function_data;
     read_psf_fits(&point_spread_function_data, argv[1]);
 
-    setup_psf_texture(point_spread_function_data.dimensions[0],
-                      point_spread_function_data.dimensions[1],
+    setup_psf_texture((int) point_spread_function_data.dimensions[0],
+                      (int) point_spread_function_data.dimensions[1],
                       point_spread_function_data.image_pixels);
 
     star_data star_data_from_file;
@@ -97,6 +97,7 @@ int main(const int argc, char *argv[]) {
     write_simulation_fits(result, argv[3], "TODO");
 
     PANIC_ON_BAD_CUDA_STATUS(cudaDeviceReset());
+    star_data_release(star_data_from_file);
     psf_data_release(point_spread_function_data);
     simulation_data_release(result);
     exit(EXIT_SUCCESS);
