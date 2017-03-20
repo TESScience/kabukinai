@@ -1,5 +1,6 @@
 #ifndef SUM_INTENSITIES_CU
 #define SUM_INTENSITIES_CU
+
 #include "star_data.h"
 #include "kabukinai.h"
 #include <stdio.h>
@@ -13,93 +14,95 @@ texture<float, cudaTextureType2DLayered, cudaReadModeElementType> psf_texture;
 
 __host__ void setup_psf_texture(const int height, const int width, const float *data) {
 
-	// Make the type definition for a single float element
-	
-	const cudaChannelFormatDesc floatDesc = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat );
-	
-	// Make an array to hold the texture on the device
+    // Make the type definition for a single float element
 
-	cudaArray* floatArray;
-	PANIC_ON_BAD_CUDA_STATUS(cudaMalloc3DArray(&floatArray, &floatDesc, make_cudaExtent( height, width, STAR_COLORS ), 0));
+    const cudaChannelFormatDesc floatDesc = cudaCreateChannelDesc(32, 0, 0, 0, cudaChannelFormatKindFloat);
 
-	// Copy the data to the array
-	const size_t size = height * width * STAR_COLORS * sizeof( float );
-	PANIC_ON_BAD_CUDA_STATUS(cudaMemcpyToArray(floatArray, 0, 0, data, size, cudaMemcpyHostToDevice));
+    // Make an array to hold the texture on the device
 
-	// Return zero for accesses outside the PSF texture
-	
-	psf_texture.addressMode[0] = cudaAddressModeBorder;
-	psf_texture.addressMode[1] = cudaAddressModeBorder;
-	
-	// Interpolate between samples
-	
-	psf_texture.filterMode = cudaFilterModeLinear;
+    cudaArray *floatArray;
+    PANIC_ON_BAD_CUDA_STATUS(
+            cudaMalloc3DArray(&floatArray, &floatDesc, make_cudaExtent(height, width, STAR_COLORS), 0));
 
-	// Use [0,1] as the coordinate limits of the texture.
-	// This means cu_psf need not pay attention to oversampling.
-	
-	psf_texture.normalized = true;
+    // Copy the data to the array
+    const size_t size = height * width * STAR_COLORS * sizeof(float);
+    PANIC_ON_BAD_CUDA_STATUS(cudaMemcpyToArray(floatArray, 0, 0, data, size, cudaMemcpyHostToDevice));
 
-	// Bind the texture to its data
-		
-	PANIC_ON_BAD_CUDA_STATUS(cudaBindTextureToArray(psf_texture, floatArray, floatDesc));
+    // Return zero for accesses outside the PSF texture
+
+    psf_texture.addressMode[0] = cudaAddressModeBorder;
+    psf_texture.addressMode[1] = cudaAddressModeBorder;
+
+    // Interpolate between samples
+
+    psf_texture.filterMode = cudaFilterModeLinear;
+
+    // Use [0,1] as the coordinate limits of the texture.
+    // This means CU_PSF need not pay attention to oversampling.
+
+    psf_texture.normalized = true;
+
+    // Bind the texture to its data
+
+    PANIC_ON_BAD_CUDA_STATUS(cudaBindTextureToArray(psf_texture, floatArray, floatDesc));
 }
 
-// Get the PSF amplitude at pixel coordinates x, y relative to the 
-// center of the PSF
-
-__device__ inline float cu_psf(const float x, const float y, const int color, const star_meta_data meta_data) {
-    const float norm_x = x / meta_data.single_panel_pixel_dimensions.x_dimension + 0.5;
-    const float norm_y = y / meta_data.single_panel_pixel_dimensions.y_dimension + 0.5;
-    return tex2DLayered(psf_texture, norm_x, norm_y, color);
-}
-
+// Get the PSF amplitude at pixel coordinates x, y relative to the center of the PSF
+#define CU_PSF(x, y, color, meta_data, texture) \
+    tex2DLayered((texture), \
+                 (x) / (meta_data).single_panel_pixel_dimensions.x_dimension + 0.5, \
+                 (y) / (meta_data).single_panel_pixel_dimensions.y_dimension + 0.5, \
+                 (color));
 
 __global__ void
 sum_intensities_for_pixel(float *pixel, const star *stars, int *panel_indices, const star_meta_data meta_data) {
 
     float my_pixel = 0.0;   // This thread's pixel value
-    const int pixel_x = blockIdx.x * blockDim.x + threadIdx.x;
-    const int pixel_y = blockIdx.y * blockDim.y + threadIdx.x;
-    const int pixel_index = pixel_y * meta_data.image_dimensions.x_dimension + pixel_x;
-    
-    printf( "***********pixel_x = %d, pixel_y = %d***********\n",
-    	pixel_x, pixel_y );
+    const int pixel_x_coordinate = blockIdx.x * blockDim.x + threadIdx.x;
+    const int pixel_y_coordinate = blockIdx.y * blockDim.y + threadIdx.x;
+    const float pixel_x = (float) pixel_x_coordinate;
+    const float pixel_y = (float) pixel_y_coordinate;
+
+    printf("***********pixel_x = %g, pixel_y = %g***********\n", pixel_x, pixel_y);
 
     for (int panel_indexX = (int) blockIdx.x - 1; panel_indexX <= (int) blockIdx.x + 1; ++panel_indexX) {
         for (int panel_indexY = (int) blockIdx.y - 1; panel_indexY <= (int) blockIdx.y + 1; ++panel_indexY) {
-	
-	    printf( "*********panel_indexX = %d, panel_indexY = %d***********\n", panel_indexX, panel_indexY);
-	    
-            const int neighborhood_index = panel_index_lookup(panel_indexX, panel_indexY, meta_data);
-	    
-	    printf( "***********neighborhood_index = %d*************\n", neighborhood_index );
-	    
+            // TODO: Check if panel indices are valid
+
+            printf("*********panel_indexX = %d, panel_indexY = %d***********\n", panel_indexX, panel_indexY);
+
+            const int neighborhood_index = PANEL_INDEX_LOOKUP_BY_PANEL_INDICES(panel_indexX, panel_indexY, meta_data);
+
+            printf("***********neighborhood_index = %d*************\n", neighborhood_index);
+
             const int panel_start = panel_indices[neighborhood_index];
-	    
-	    printf( "***********panel_start = %d*************\n", panel_start );
-	    
+
+            printf("***********panel_start = %d*************\n", panel_start);
+
             const int panel_end = panel_indices[neighborhood_index + 1];
-	    
-	    printf( "***********panel_end = %d*************\n", panel_end );
-	    
+
+            printf("***********panel_end = %d*************\n", panel_end);
+
             for (int star_index = panel_start; star_index < panel_end; ++star_index) {
                 const star star_data = stars[star_index];
-                for (int color = 0; color < STAR_COLORS; ++color){
-		
-		    printf( "************intensity = %f***********\n", star_data.intensities[color]);
-		    printf( "************x = %f, y = %f***********\n", star_data.point.x, star_data.point.y);
-		     
-                    my_pixel +=
-                            star_data.intensities[color] *
-                            cu_psf(star_data.point.x - pixel_x, star_data.point.y - pixel_y, color, meta_data);
-	        }
+                for (int color = 0; color < STAR_COLORS; ++color) {
+
+                    printf("************intensity = %f***********\n", star_data.intensities[color]);
+                    printf("************x = %f, y = %f***********\n", star_data.point.x, star_data.point.y);
+
+                    my_pixel += star_data.intensities[color] * CU_PSF(star_data.point.x - pixel_x,
+                                                                      star_data.point.y - pixel_y,
+                                                                      color,
+                                                                      meta_data,
+                                                                      psf_texture);
+                }
             }
         }
     }
-    
-    printf( "**************my_pixel = %f**************\n", my_pixel);
-    
+
+    printf("**************my_pixel = %f**************\n", my_pixel);
+
+    const int pixel_index = pixel_y_coordinate * meta_data.image_dimensions.x_dimension + pixel_x_coordinate;
     pixel[pixel_index] = my_pixel;
 }
 
