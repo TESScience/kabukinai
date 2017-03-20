@@ -1,10 +1,9 @@
 #include <stdio.h>
 #include "psf.h"
-#include "sum_intensities.cu"
 #include "kabukinai.h"
 #include "star_data.h"
+#include "sum_intensities.cuh"
 #include <stdlib.h>
-#include <stddef.h>
 
 #define PANEL_SIDE_DIMENSION 32
 #define TESS_IMAGE_HEIGHT 2058

@@ -1,6 +1,7 @@
 #ifndef SUM_INTENSITIES_CU
 #define SUM_INTENSITIES_CU
 
+#include "sum_intensities.cuh"
 #include "star_data.h"
 #include "kabukinai.h"
 #include <stdio.h>
