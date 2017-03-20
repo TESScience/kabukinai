@@ -1,6 +1,8 @@
 #ifndef KABUKINAI_STAR_DATA_H
 #define KABUKINAI_STAR_DATA_H
 
+#include <math.h>
+
 #define STAR_COLORS 1
 
 #ifdef __cplusplus
@@ -31,28 +33,27 @@ typedef struct {
     dimensions image_dimensions;
 } star_meta_data;
 
-#ifdef __NVCC__
-__host__ __device__
-#endif
-
-inline point_2d compute_panel_2d_indices(const float x, const float y, const star_meta_data meta_data) {
-    point_2d point;
-    point.x = x / meta_data.single_panel_pixel_dimensions.x_dimension + 1;
-    point.y = y / meta_data.single_panel_pixel_dimensions.y_dimension + 1;
-    return point;
-}
-
-#ifdef __NVCC__
-__host__ __device__
-#endif
-
-inline int panel_index_lookup(const float x, const float y, const star_meta_data meta_data) {
-    const point_2d panel_indices = compute_panel_2d_indices(x, y, meta_data);
-    if (panel_indices.x < 0 || panel_indices.x >= meta_data.panel_indices_dimensions.x_dimension ||
-        panel_indices.y < 0 || panel_indices.y >= meta_data.panel_indices_dimensions.y_dimension)
-        return -1;
-    return panel_indices.y * meta_data.panel_indices_dimensions.x_dimension + panel_indices.x;
-}
+#define PANEL_INDEX_LOOKUP_BY_PANEL_INDICES(x, y, meta_data) \
+    (((y)+1) * meta_data.panel_indices_dimensions.x_dimension + ((x)+1))
+#define PANEL_COORDINATE_FOR_PIXEL_X_COORDINATE(x, metadata) \
+    ((int) floorf(((float) (x)) / ((float) meta_data.single_panel_pixel_dimensions.x_dimension)))
+#define PANEL_COORDINATE_FOR_PIXEL_Y_COORDINATE(y, metadata) \
+    ((int) floorf(((float) (y)) / ((float) meta_data.single_panel_pixel_dimensions.y_dimension)))
+#define PANEL_INDEX_LOOKUP_BY_PIXEL(x, y, meta_data) \
+    PANEL_INDEX_LOOKUP_BY_PANEL_INDICES( \
+        PANEL_COORDINATE_FOR_PIXEL_X_COORDINATE(x, metadata), \
+        PANEL_COORDINATE_FOR_PIXEL_Y_COORDINATE(y, metadata), \
+        meta_data)
+#define CHECK_PANEL_INDICES_VALID(x, y, meta_data) \
+    !(((x)+1) < 0 || \
+      ((x)+1) >= meta_data.panel_indices_dimensions.x_dimension || \
+      ((y)+1) < 0 || \
+      ((y)+1) >= meta_data.panel_indices_dimensions.y_dimension)
+#define CHECK_PIXEL_VALID(x, y, meta_data) \
+    CHECK_PANEL_INDICES_VALID( \
+        PANEL_COORDINATE_FOR_PIXEL_X_COORDINATE(x, meta_data), \
+        PANEL_COORDINATE_FOR_PIXEL_Y_COORDINATE(y, meta_data), \
+        meta_data)
 
 /*
  * Star data has an array of stars, organized into groups of panels, and an array of panel indices
@@ -64,17 +65,14 @@ typedef struct {
      * the final element is number of elements in the star array in data. */
     int *panel_indices;
 
-    
+
     star_meta_data meta_data;
 } star_data;
 
-inline int number_of_panel_indices(const star_data data) {
-	return data.meta_data.panel_indices_dimensions.x_dimension * data.meta_data.panel_indices_dimensions.y_dimension + 1;
-}
+#define NUMBER_OF_PANEL_INDICES(data)  \
+    ((data).meta_data.panel_indices_dimensions.x_dimension * (data).meta_data.panel_indices_dimensions.y_dimension + 1)
 
-inline int number_of_stars(const star_data data) {
-	return data.panel_indices[number_of_panel_indices(data) - 1];
-}
+#define NUMBER_OF_STARS(data) ((data).panel_indices[NUMBER_OF_PANEL_INDICES(data) - 1])
 
 int parse_star_data_from_tsv(star_data *data,
                              const char *file_name,
