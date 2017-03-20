@@ -22,8 +22,8 @@ ADD_TEST(
 )
 
 ADD_CUSTOM_TARGET(test_coordinate_calculation
-	COMMAND run_test_coordinate_calculation
-	DEPENDS run_test_coordinate_calculation)
+        COMMAND run_test_coordinate_calculation
+        DEPENDS run_test_coordinate_calculation)
 
 ADD_CUSTOM_TARGET(test_parse_star_data
         COMMAND parse_star_data_tsv star_test_data.tsv
@@ -31,6 +31,5 @@ ADD_CUSTOM_TARGET(test_parse_star_data
 
 ADD_TEST(
         NAME parse_star_data_unit_test
-        COMMAND parse_star_data_tsv star_test_data.tsv
-        DEPENDS parse_star_data_tsv star_test_data.tsv
+        COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target test_parse_star_data
 )

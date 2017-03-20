@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 offset = -16
-panel_height = 65
 panel_width = 66
+panel_height = 67
 stride = 32
 
 with open('star_test_data.tsv', 'w') as output:
