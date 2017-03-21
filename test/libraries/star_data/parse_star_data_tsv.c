@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include "star_data.h"
 
-int count_lines(const char* file_name) {
-    FILE * fp = fopen(file_name, "r");
+int count_lines(const char *file_name) {
+    FILE *fp = fopen(file_name, "r");
     int line_count = 0;
-    char * line = NULL;
-    size_t  len = 0;
+    char *line = NULL;
+    size_t len = 0;
     while (getline(&line, &len, fp) != -1) ++line_count;
     fclose(fp);
     return line_count;
@@ -36,6 +36,15 @@ int main(const int argc, const char *argv[]) {
         star_data_release(data);
         exit(EXIT_FAILURE);
     }
+    for (int x = 0; x < data.meta_data.panel_indices_dimensions.x_dimension; ++x)
+        for (int y = 0; y < data.meta_data.panel_indices_dimensions.x_dimension; ++y) {
+            const int panel_index = PANEL_INDEX_LOOKUP_BY_PANEL_INDICES(x - 1, y - 1, data.meta_data);
+            const int panel_star_count = data.panel_indices[panel_index + 1] - data.panel_indices[panel_index];
+            if (panel_star_count != 1) {
+                fprintf(stderr, "Expected panel (%i, %i) to have one star, had: %i\n", x - 1, y - 1, panel_star_count);
+                exit(EXIT_FAILURE);
+            }
+        }
     star_data_release(data);
     exit(EXIT_SUCCESS);
 }
