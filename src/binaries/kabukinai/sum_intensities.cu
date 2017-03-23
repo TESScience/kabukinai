@@ -77,8 +77,10 @@ sum_intensities_for_pixel(float *pixel, const star *stars, int *panel_indices, c
     float my_pixel = 0.0;   // This thread's pixel value
     const int pixel_x_coordinate = blockIdx.x * blockDim.x + threadIdx.x;
     const int pixel_y_coordinate = blockIdx.y * blockDim.y + threadIdx.y;
-    const float pixel_x = (float) pixel_x_coordinate + 0.5f;
-    const float pixel_y = (float) pixel_y_coordinate + 0.5f;
+//    const float pixel_x = (float) pixel_x_coordinate + 0.5f;
+    const float pixel_x = (float) pixel_x_coordinate + 1.0f;
+//    const float pixel_y = (float) pixel_y_coordinate + 0.5f;
+    const float pixel_y = (float) pixel_y_coordinate + 1.0f;
 
     for (int panel_indexX = (int) blockIdx.x - 1; panel_indexX <= (int) blockIdx.x + 1; ++panel_indexX) {
         for (int panel_indexY = (int) blockIdx.y - 1; panel_indexY <= (int) blockIdx.y + 1; ++panel_indexY) {
