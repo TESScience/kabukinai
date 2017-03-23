@@ -78,26 +78,12 @@ int star_data_from_vector(star_data *data,
     const unsigned long number_of_panels = (const unsigned long) (meta_data.panel_indices_dimensions.x_dimension *
                                                                   meta_data.panel_indices_dimensions.y_dimension);
 
-    std::vector< std::vector< star > > panel_intermediate_data(number_of_panels);
+    std::vector<std::vector<star> > panel_intermediate_data(number_of_panels);
     for (const star &star_data : stars) {
-        if (!CHECK_PIXEL_VALID(star_data.point.x, star_data.point.y, meta_data)) {
-            char error_message_data[1024];
-            snprintf(error_message_data, sizeof(error_message_data),
-                     "Star coordinates out of bounds: {\"x\": %g, \"y\": %g}\n"
-                             "Indices of panel for point: {\"x\": %i, \"y\": %i}\n"
-                             "Single panel pixel dimensions: {\"x_dimension\": %i, \"y_dimension\": %i}\n"
-                             "Panel indices dimensions: {\"x_dimension\": %i, \"y_dimension\": %i}\n",
-                     star_data.point.x, star_data.point.y,
-                     PANEL_COORDINATE_FOR_PIXEL_X_COORDINATE(star_data.point.x, meta_data),
-                     PANEL_COORDINATE_FOR_PIXEL_Y_COORDINATE(star_data.point.y, meta_data),
-                     meta_data.single_panel_pixel_dimensions.x_dimension,
-                     meta_data.single_panel_pixel_dimensions.y_dimension,
-                     meta_data.panel_indices_dimensions.x_dimension,
-                     meta_data.panel_indices_dimensions.y_dimension);
-            throw StarDataException(error_message_data);
+        if (CHECK_PIXEL_VALID(star_data.point.x, star_data.point.y, meta_data)) {
+            const int panel_index = PANEL_INDEX_LOOKUP_BY_PIXEL(star_data.point.x, star_data.point.y, meta_data);
+            panel_intermediate_data.at((unsigned long) panel_index).push_back(star_data);
         }
-        const int panel_index = PANEL_INDEX_LOOKUP_BY_PIXEL(star_data.point.x, star_data.point.y, meta_data);
-        panel_intermediate_data.at((unsigned long) panel_index).push_back(star_data);
     }
     data->panel_indices = (int *) calloc(sizeof(int), number_of_panels + 1);
     data->stars = (star *) calloc(sizeof(star), stars.size());
