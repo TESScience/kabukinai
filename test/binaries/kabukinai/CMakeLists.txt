@@ -17,3 +17,7 @@ ADD_CUSTOM_TARGET(
         COMMAND kabukinai psf.fits star_test_data.tsv simulated_image.fits
         DEPENDS star_test_data.tsv psf.fits kabukinai)
 
+ADD_TEST(
+        NAME kabukinai_smoke_test
+        COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target test_kabukinai
+)
