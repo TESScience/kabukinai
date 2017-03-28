@@ -4,14 +4,37 @@
 #include "star_data.h"
 #include "sum_intensities.cuh"
 #include <stdlib.h>
+#include "argparse.h"
 
 #define PANEL_SIDE_DIMENSION 32
 #define TESS_IMAGE_HEIGHT 2058
 #define TESS_IMAGE_WIDTH 2048
 
-int main(const int argc, char *argv[]) {
+static const char *description = "\nkabukinai is a program for generating simulated camera FITS images";
+
+static const char *usage[] = {
+        "kabukinai psf.fits star_data.tsv output.fits",
+        NULL,
+};
+
+int main(int argc, const char *argv[]) {
+    struct argparse_option options[] = {
+            OPT_HELP(),
+            OPT_END(),
+    };
+
+    struct argparse parser;
+    argparse_init(&parser, options, usage, 0);
+    argparse_describe(&parser, description, "");
+    argc = argparse_parse(&parser, argc, argv);
+
+    if (argc != 3) {
+        fprintf(stderr, "Insufficient number of command line arguments given\n");
+        exit(EXIT_FAILURE);
+    }
+
     psf_data point_spread_function_data;
-    read_psf_fits(&point_spread_function_data, argv[1]);
+    read_psf_fits(&point_spread_function_data, argv[0]);
 
     setup_psf_texture((int) point_spread_function_data.dimensions[0],
                       (int) point_spread_function_data.dimensions[1],
@@ -26,7 +49,7 @@ int main(const int argc, char *argv[]) {
     single_panel_pixel_dimensions.x_dimension = PANEL_SIDE_DIMENSION;
     single_panel_pixel_dimensions.y_dimension = PANEL_SIDE_DIMENSION;
 
-    parse_star_data_from_tsv(&star_data_from_file, argv[2], image_dimensions, single_panel_pixel_dimensions);
+    parse_star_data_from_tsv(&star_data_from_file, argv[1], image_dimensions, single_panel_pixel_dimensions);
 
 
     const size_t image_size = sizeof(float) * image_dimensions.x_dimension * image_dimensions.y_dimension;
@@ -71,7 +94,7 @@ int main(const int argc, char *argv[]) {
     PANIC_ON_BAD_CUDA_STATUS(cudaMemcpy(result.image_pixels, pixels, image_size, cudaMemcpyDeviceToHost));
 
 
-    write_simulation_fits(result, argv[3], "TODO");
+    write_simulation_fits(result, argv[2], "TODO");
 
     PANIC_ON_BAD_CUDA_STATUS(cudaDeviceReset());
     star_data_release(star_data_from_file);
