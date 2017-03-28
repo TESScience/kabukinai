@@ -5,15 +5,17 @@ configure_file(generate_star_test_data_tsv.py generate_star_test_data_tsv.py COP
 
 ADD_CUSTOM_COMMAND(
         OUTPUT star_test_data.tsv
-        COMMAND python3 generate_star_test_data_tsv.py
+        COMMAND python generate_star_test_data_tsv.py
         DEPENDS generate_star_test_data_tsv.py
 )
 
 SET(parse_star_data_tsv_SOURCES parse_star_data_tsv.c star_data.h)
 ADD_EXECUTABLE(parse_star_data_tsv ${parse_star_data_tsv_SOURCES})
+SET_PROPERTY(TARGET parse_star_data_tsv PROPERTY C_STANDARD 11)
 TARGET_LINK_LIBRARIES(parse_star_data_tsv star_data)
 
 ADD_EXECUTABLE(run_test_coordinate_calculation test_coordinate_calculation.c star_data.h)
+SET_PROPERTY(TARGET run_test_coordinate_calculation PROPERTY C_STANDARD 11)
 TARGET_LINK_LIBRARIES(run_test_coordinate_calculation star_data)
 
 ADD_TEST(

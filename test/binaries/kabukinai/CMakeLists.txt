@@ -5,7 +5,7 @@ configure_file(generate_star_test_data_tsv.py generate_star_test_data_tsv.py COP
 
 ADD_CUSTOM_COMMAND(
         OUTPUT star_test_data.tsv
-        COMMAND python3 generate_star_test_data_tsv.py
+        COMMAND python generate_star_test_data_tsv.py
         DEPENDS generate_star_test_data_tsv.py)
 
 ADD_CUSTOM_COMMAND(
