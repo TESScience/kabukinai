@@ -23,7 +23,7 @@ int main(int argc, const char* argv[]) {
 
 	int oversampling = 3; 
 	char oversampling_description[256];
-	snprintf(side_length_description, sizeof(oversampling_description), "the oversampling of the CCD pixel in the output array, defaults to %i", oversampling);
+	snprintf(oversampling_description, sizeof(oversampling_description), "the oversampling of the CCD pixel in the output array, defaults to %i", oversampling);
 
 	struct argparse_option options[] = {
 		OPT_HELP(),
