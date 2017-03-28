@@ -8,7 +8,7 @@ You will need to install CUDA before installing `kabukinai`.
 
 The most straight-forward way of doing this is to go to the NVIDIA CUDA website, and follow the instructions for your platform:
 
-https://developer.nvidia.com/cuda-downloads
+http://docs.nvidia.com/cuda/cuda-installation-guide-linux/
 
 ### CMAKE
 
@@ -20,10 +20,10 @@ On Debian based linux systems, this can be done by executing at the command line
 # sudo apt-get install cmake
 ```
 
-On RedHat based linux systems, execute:
+On RedHat based linux systems, execute (note that on CentOS you may first need to run `yum install epel-release`):
 
 ```
-# sudo yum install cmake
+# sudo yum install cmake3
 ```
 
 On OS X, `cmake` can be installed using [Homebrew](http://brew.sh/)
