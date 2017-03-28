@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "../../libraries/argparse/argparse.h"
-#include "../../libraries/psf/psf.h"
+#include "argparse.h"
+#include "psf.h"
 
 static const char *description =
         "\npsfgen is a program for creating a FITS file containing a TESS point spread function image";
