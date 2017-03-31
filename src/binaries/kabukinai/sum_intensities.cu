@@ -72,7 +72,7 @@ __host__ void setup_psf_texture(const int height, const int width, const float *
 
 
 __global__ void
-sum_intensities_for_pixel(float *pixel, const star *stars, int *panel_indices, const star_meta_data meta_data) {
+sum_intensities_for_pixel(float *pixel, const star_pixel_coordinate *stars, int *panel_indices, const star_meta_data meta_data) {
 
     float my_pixel = 0.0;   // This thread's pixel value
     const int pixel_x_coordinate = blockIdx.x * blockDim.x + threadIdx.x;
@@ -89,7 +89,7 @@ sum_intensities_for_pixel(float *pixel, const star *stars, int *panel_indices, c
             const int panel_start = panel_indices[neighborhood_index];
             const int panel_end = panel_indices[neighborhood_index + 1];
             for (int star_index = panel_start; star_index < panel_end; ++star_index) {
-                const star star_data = stars[star_index];
+                const star_pixel_coordinate star_data = stars[star_index];
                 for (int color = 0; color < STAR_COLORS; ++color)
                     my_pixel += star_data.intensities[color] * CU_PSF(star_data.point.x - pixel_x,
                                                                       star_data.point.y - pixel_y,

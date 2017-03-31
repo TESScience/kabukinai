@@ -35,14 +35,14 @@ protected:
     std::string msg_;
 };
 
-std::vector<star> parse_star_vector_from_tsv(const char *file_name) {
+std::vector<star_pixel_coordinate> parse_star_vector_from_tsv(const char *file_name) {
     std::ifstream infile(file_name);
-    std::vector<star> star_vector;
+    std::vector<star_pixel_coordinate> star_vector;
     std::string line;
     float intensities[8];
     while (std::getline(infile, line)) {
         const char *cline = line.c_str();
-        star new_star;
+        star_pixel_coordinate new_star;
         int parsed_arguments = sscanf(cline, "%g %g %g %g %g %g %g %g %g %g",
                                       &new_star.point.x,
                                       &new_star.point.y,
@@ -69,7 +69,7 @@ int star_data_from_vector(star_data *data,
                           const std::vector<T> stars,
                           const dimensions image_dimensions,
                           const dimensions single_panel_pixel_dimensions,
-                          const std::function<star(T)> transform_input_to_star) {
+                          const std::function<star_pixel_coordinate(T)> transform_input_to_star) {
 
     data->meta_data.single_panel_pixel_dimensions = single_panel_pixel_dimensions;
     data->meta_data.image_dimensions = image_dimensions;
@@ -82,16 +82,16 @@ int star_data_from_vector(star_data *data,
     const unsigned long number_of_panels = (const unsigned long) (meta_data.panel_indices_dimensions.x_dimension *
                                                                   meta_data.panel_indices_dimensions.y_dimension);
 
-    std::vector<std::vector<star> > panel_intermediate_data(number_of_panels);
+    std::vector<std::vector<star_pixel_coordinate> > panel_intermediate_data(number_of_panels);
     for (const T &input : stars) {
-        const star input_star = transform_input_to_star(input);
+        const star_pixel_coordinate input_star = transform_input_to_star(input);
         if (CHECK_PIXEL_VALID(input_star.point.x, input_star.point.y, meta_data)) {
             const int panel_index = PANEL_INDEX_LOOKUP_BY_PIXEL(input_star.point.x, input_star.point.y, meta_data);
             panel_intermediate_data.at((unsigned long) panel_index).push_back(input_star);
         }
     }
     data->panel_indices = (int *) calloc(sizeof(int), number_of_panels + 1);
-    data->stars = (star *) calloc(sizeof(star), stars.size());
+    data->stars = (star_pixel_coordinate *) calloc(sizeof(star_pixel_coordinate), stars.size());
     data->panel_indices[number_of_panels] = (int) stars.size();
     int panel_index = 0;
     for (unsigned long i = 0; i < number_of_panels; ++i) {
@@ -108,10 +108,10 @@ int parse_star_data_from_tsv(star_data *data,
                              const char *file_name,
                              const dimensions image_dimensions,
                              const dimensions single_panel_pixel_dimensions) {
-    return star_data_from_vector<star>(data,
+    return star_data_from_vector<star_pixel_coordinate>(data,
                                        parse_star_vector_from_tsv(file_name),
                                        image_dimensions,
                                        single_panel_pixel_dimensions,
-                                       [](star x) -> star { return x; });
+                                       [](star_pixel_coordinate x) -> star_pixel_coordinate { return x; });
 }
 }
