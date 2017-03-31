@@ -1,6 +1,7 @@
 #include "star_data.h"
-#include <fstream>
 #include <vector>
+#include <functional>
+#include <fstream>
 
 class StarDataException : public std::exception {
 public:
@@ -62,10 +63,13 @@ std::vector<star> parse_star_vector_from_tsv(const char *file_name) {
     return star_vector;
 }
 
+
+template<typename T>
 int star_data_from_vector(star_data *data,
-                          const std::vector<star> stars,
+                          const std::vector<T> stars,
                           const dimensions image_dimensions,
-                          const dimensions single_panel_pixel_dimensions) {
+                          const dimensions single_panel_pixel_dimensions,
+                          const std::function<star(T)> transform_input_to_star) {
 
     data->meta_data.single_panel_pixel_dimensions = single_panel_pixel_dimensions;
     data->meta_data.image_dimensions = image_dimensions;
@@ -79,10 +83,11 @@ int star_data_from_vector(star_data *data,
                                                                   meta_data.panel_indices_dimensions.y_dimension);
 
     std::vector<std::vector<star> > panel_intermediate_data(number_of_panels);
-    for (const star &star_data : stars) {
-        if (CHECK_PIXEL_VALID(star_data.point.x, star_data.point.y, meta_data)) {
-            const int panel_index = PANEL_INDEX_LOOKUP_BY_PIXEL(star_data.point.x, star_data.point.y, meta_data);
-            panel_intermediate_data.at((unsigned long) panel_index).push_back(star_data);
+    for (const T &input : stars) {
+        const star input_star = transform_input_to_star(input);
+        if (CHECK_PIXEL_VALID(input_star.point.x, input_star.point.y, meta_data)) {
+            const int panel_index = PANEL_INDEX_LOOKUP_BY_PIXEL(input_star.point.x, input_star.point.y, meta_data);
+            panel_intermediate_data.at((unsigned long) panel_index).push_back(input_star);
         }
     }
     data->panel_indices = (int *) calloc(sizeof(int), number_of_panels + 1);
@@ -103,7 +108,10 @@ int parse_star_data_from_tsv(star_data *data,
                              const char *file_name,
                              const dimensions image_dimensions,
                              const dimensions single_panel_pixel_dimensions) {
-    return star_data_from_vector(data, parse_star_vector_from_tsv(file_name), image_dimensions,
-                                 single_panel_pixel_dimensions);
+    return star_data_from_vector<star>(data,
+                                       parse_star_vector_from_tsv(file_name),
+                                       image_dimensions,
+                                       single_panel_pixel_dimensions,
+                                       [](star x) -> star { return x; });
 }
 }
