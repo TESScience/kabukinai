@@ -58,8 +58,8 @@ int main(int argc, const char *argv[]) {
     PANIC_ON_BAD_CUDA_STATUS(cudaMalloc((void **) &pixels, image_size));
     PANIC_ON_BAD_CUDA_STATUS(cudaMemset((void *) pixels, 0, image_size));
 
-    star *stars;
-    const size_t stars_size = sizeof(star) * NUMBER_OF_STARS(star_data_from_file);
+    star_pixel_coordinate *stars;
+    const size_t stars_size = sizeof(star_pixel_coordinate) * NUMBER_OF_STARS(star_data_from_file);
 
     PANIC_ON_BAD_CUDA_STATUS(cudaMalloc((void **) &stars, stars_size));
     PANIC_ON_BAD_CUDA_STATUS(cudaMemcpy(stars, star_data_from_file.stars, stars_size, cudaMemcpyHostToDevice));

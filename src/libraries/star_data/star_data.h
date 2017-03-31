@@ -16,12 +16,12 @@ typedef struct {
 } point_2d;
 
 /*
- * A star has x, y coordinates and an intensity for each star color.
+ * A star (using pixel coordinates) has x, y coordinates and an intensity for each star color.
  */
 typedef struct {
     point_2d point;
     float intensities[STAR_COLORS];
-} star;
+} star_pixel_coordinate;
 
 typedef struct {
     int x_dimension, y_dimension;
@@ -59,7 +59,7 @@ typedef struct {
  * Star data has an array of stars, organized into groups of panels, and an array of panel indices
  */
 typedef struct {
-    star *stars;
+    star_pixel_coordinate *stars;
 
     /* panel_indices has (panel_indices_dimensions[0] * panel_indices_dimensions[1] + 1) elements
      * the final element is number of elements in the star array in data. */
