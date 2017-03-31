@@ -1,7 +1,7 @@
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -Wno-long-long -pedantic -g")
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -Wno-long-long -pedantic -g")
 
-configure_file(generate_star_test_data_tsv.py generate_star_test_data_tsv.py COPYONLY)
+CONFIGURE_FILE(generate_star_test_data_tsv.py generate_star_test_data_tsv.py COPYONLY)
 
 ADD_CUSTOM_COMMAND(
         OUTPUT star_test_data.tsv

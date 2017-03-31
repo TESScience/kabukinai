@@ -1,6 +1,6 @@
 SET(TRY_SLICING_SOURCES try_slicing.cu httm.cu kabukinai.h)
 
-configure_file(generate_star_test_data_tsv.py generate_star_test_data_tsv.py COPYONLY)
+CONFIGURE_FILE(generate_star_test_data_tsv.py generate_star_test_data_tsv.py COPYONLY)
 
 ADD_CUSTOM_COMMAND(
         OUTPUT star_test_data.tsv
