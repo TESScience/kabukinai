@@ -1,4 +1,6 @@
 #include "kabukinai.h"
+#include "curand_kernel.h"
+#include "math.h"
 
 // A kernel to extract slices in reverse, 'cause there's not a cudaMemcpy variant for that
 // Launch with a grid dimension of the image height, block dimension of the slice image width
@@ -83,7 +85,8 @@ __global__ void cu_smear(
 	int early_darks, 
 	int smear_rows, 
 	int image_height, 
-	int slice_width 
+	int slice_width,
+	float smear_ratio
 )
 {
 	double smear = 0.0;
@@ -93,11 +96,15 @@ __global__ void cu_smear(
 		image_pixel += slice_width;
 	}
 	// Note that image_pixel automagically winds up pointing to the first smear row
+	
+	smear *= smear_ratio;
+	
 	for( int i = 0; i < smear_rows; i += 1 ) {
 		*image_pixel = smear;
 		image_pixel += slice_width;
 	}
 }
+
 
 __host__ void add_smear( simulation_data *d ) {
 	int height = d->dimensions[0];
@@ -113,7 +120,64 @@ __host__ void add_smear( simulation_data *d ) {
 		d->early_dark_pixels,
 		d->smear_rows,
 		height,
-		slice_width );
+		slice_width,
+		d->smear_ratio );
 		
 	PANIC_ON_BAD_CUDA_STATUS(cudaDeviceSynchronize());
 }
+
+
+__global__ void cu_noise( 
+	float * slice, 
+	int slice_size, 
+	int height, 
+	int slice_width,
+	unsigned long long random_seed,
+	unsigned long long random_offset,
+	float readout_noise_variance
+)
+{
+	curandState_t random_state;
+	curand_init ( 
+		random_seed, 
+		(unsigned long long) threadIdx.x, 
+		random_offset, 
+		&random_state );
+
+	float *image_pixel = slice + threadIdx.x;
+	for( int i = 0; i < height; i += 1) {
+		
+		*image_pixel += 
+			sqrtf(readout_noise_variance + *image_pixel) * 
+			curand_normal (&random_state);
+		image_pixel += slice_width;
+	}
+}
+
+
+__host__ void add_noise( simulation_data *d ) {
+	int height = d->dimensions[0];
+	int width = d->dimensions[1];
+	int slice_image_width = width/d->number_of_slices;
+	int slice_width = slice_image_width + d->early_dark_pixels + d->late_dark_pixels;
+	int slice_height = height + d->smear_rows + d->final_dark_rows;
+	int slice_size = slice_width*slice_height;
+	
+	for( int s = 0; s < d->number_of_slices; s += 1 ) {
+	
+		cu_noise<<<1, slice_image_width>>>( 
+			d->image_pixels + s * slice_size, 
+			slice_size, 
+			height,
+			slice_width,
+			d->random_seed,
+			d->random_offset + s * 1000000,
+			d->read_noise_variance[s]
+		);
+	}
+		
+	PANIC_ON_BAD_CUDA_STATUS(cudaDeviceSynchronize());
+	
+	d->random_offset += 10000000;	// be sure we get new numbers next call
+}
+

@@ -21,6 +21,9 @@ typedef struct {
     float *image_pixels;
     long dimensions[2];
     int number_of_slices, early_dark_pixels, late_dark_pixels, smear_rows, final_dark_rows;
+    float smear_ratio;
+    unsigned long long random_seed, random_offset;
+    float *read_noise_variance;	// dimension is number_of_slices
 } simulation_data;
 
 int write_simulation_fits(simulation_data data, const char *fits_file_name, const char *history);

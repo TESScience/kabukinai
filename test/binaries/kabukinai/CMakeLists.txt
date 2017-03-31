@@ -1,4 +1,5 @@
 SET(TRY_SLICING_SOURCES try_slicing.cu httm.cu kabukinai.h)
+SET(TRY_SMEAR_SOURCES try_smear.cu httm.cu kabukinai.h)
 
 CONFIGURE_FILE(generate_star_test_data_tsv.py generate_star_test_data_tsv.py COPYONLY)
 
@@ -22,5 +23,7 @@ ADD_TEST(
 )
 
 CUDA_ADD_EXECUTABLE(try_slicing ${TRY_SLICING_SOURCES})
+CUDA_ADD_EXECUTABLE(try_smear ${TRY_SMEAR_SOURCES})
 
 ADD_TEST(test_slicing try_slicing)
+ADD_TEST(test_smear try_smear)
