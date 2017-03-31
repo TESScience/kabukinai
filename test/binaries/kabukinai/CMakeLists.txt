@@ -1,5 +1,4 @@
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -Wno-long-long -pedantic -g")
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -Wno-long-long -pedantic -g")
+SET(TRY_SLICING_SOURCES try_slicing.cu httm.cu kabukinai.h)
 
 configure_file(generate_star_test_data_tsv.py generate_star_test_data_tsv.py COPYONLY)
 
@@ -21,3 +20,8 @@ ADD_TEST(
         NAME kabukinai_smoke_test
         COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target test_kabukinai
 )
+
+CUDA_ADD_EXECUTABLE(try_slicing ${TRY_SLICING_SOURCES})
+SET_PROPERTY(TARGET try_slicing PROPERTY C_STANDARD 11)
+
+ADD_TEST(test_slicing try_slicing)
