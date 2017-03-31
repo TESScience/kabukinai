@@ -2,6 +2,7 @@
 #define KABUKINAI_H
 
 #include <stdio.h>
+#include <stdbool.h>
 
 #define KABUKINAI_SUCCESS 0
 #define KABUKINAI_FAILURE 1
@@ -19,6 +20,7 @@ extern "C" {
 typedef struct {
     float *image_pixels;
     long dimensions[2];
+    int number_of_slices, early_dark_pixels, late_dark_pixels, smear_rows, final_dark_rows;
 } simulation_data;
 
 int write_simulation_fits(simulation_data data, const char *fits_file_name, const char *history);
@@ -27,8 +29,18 @@ void inline simulation_data_release(simulation_data data) {
     free(data.image_pixels);
 }
 
+
 #ifdef __cplusplus
 }
 #endif
+
+#ifdef __CUDACC__
+
+// HTTM-derived functions
+
+__host__ void to_slices( simulation_data *d );
+__host__ void add_smear( simulation_data *d );
+
+#endif // __CUDACC__
 
 #endif //KABUKINAI_H
