@@ -24,6 +24,14 @@ typedef struct {
 } star_pixel_coordinate;
 
 typedef struct {
+    float ra, dec;
+} sky_coordinate;
+
+typedef struct {
+    float x, y, z;
+} point_3d;
+
+typedef struct {
     int x_dimension, y_dimension;
 } dimensions;
 
