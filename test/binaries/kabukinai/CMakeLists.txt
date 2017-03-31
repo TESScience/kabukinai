@@ -22,6 +22,5 @@ ADD_TEST(
 )
 
 CUDA_ADD_EXECUTABLE(try_slicing ${TRY_SLICING_SOURCES})
-SET_PROPERTY(TARGET try_slicing PROPERTY C_STANDARD 11)
 
 ADD_TEST(test_slicing try_slicing)
