@@ -43,6 +43,7 @@ void inline simulation_data_release(simulation_data data) {
 
 __host__ void to_slices( simulation_data *d );
 __host__ void add_smear( simulation_data *d );
+__host__ void add_noise( simulation_data *d );
 
 #endif // __CUDACC__
 

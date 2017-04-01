@@ -130,7 +130,7 @@ __host__ void add_smear( simulation_data *d ) {
 __global__ void cu_noise( 
 	float * slice, 
 	int slice_size, 
-	int height, 
+	int slice_height, 
 	int slice_width,
 	unsigned long long random_seed,
 	unsigned long long random_offset,
@@ -145,7 +145,7 @@ __global__ void cu_noise(
 		&random_state );
 
 	float *image_pixel = slice + threadIdx.x;
-	for( int i = 0; i < height; i += 1) {
+	for( int i = 0; i < slice_height; i += 1) {
 		
 		*image_pixel += 
 			sqrtf(readout_noise_variance + *image_pixel) * 
@@ -165,10 +165,10 @@ __host__ void add_noise( simulation_data *d ) {
 	
 	for( int s = 0; s < d->number_of_slices; s += 1 ) {
 	
-		cu_noise<<<1, slice_image_width>>>( 
+		cu_noise<<<1, slice_width>>>( 
 			d->image_pixels + s * slice_size, 
 			slice_size, 
-			height,
+			slice_height,
 			slice_width,
 			d->random_seed,
 			d->random_offset + s * 1000000,
