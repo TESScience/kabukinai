@@ -21,7 +21,7 @@ typedef struct {
     float *image_pixels;
     long dimensions[2];
     int number_of_slices, early_dark_pixels, late_dark_pixels, smear_rows, final_dark_rows;
-    float smear_ratio;
+    float smear_ratio, exposure_time;
     unsigned long long random_seed, random_offset;
     float *read_noise_variance;	// dimension is number_of_slices
 } simulation_data;
@@ -42,7 +42,7 @@ void inline simulation_data_release(simulation_data data) {
 // HTTM-derived functions
 
 __host__ void to_slices( simulation_data *d );
-__host__ void add_smear( simulation_data *d );
+__host__ void expose_and_smear( simulation_data *d );
 __host__ void add_noise( simulation_data *d );
 
 #endif // __CUDACC__

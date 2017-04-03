@@ -79,20 +79,23 @@ to_slices( simulation_data *d ) {
 
 
 
-__global__ void cu_smear( 
+__global__ void cu_expose_and_smear( 
 	float * slices, 
 	int slice_size, 
 	int early_darks, 
 	int smear_rows, 
 	int image_height, 
 	int slice_width,
-	float smear_ratio
+	float smear_ratio,
+	float exposure_time
 )
 {
 	double smear = 0.0;
 	float *image_pixel = slices + early_darks + blockIdx.x * slice_size + threadIdx.x;
 	for( int i = 0; i < image_height; i += 1) {
-		smear += *image_pixel;
+		float p = *image_pixel * exposure_time;
+		smear += p;
+		*image_pixel = p;
 		image_pixel += slice_width;
 	}
 	// Note that image_pixel automagically winds up pointing to the first smear row
@@ -106,7 +109,7 @@ __global__ void cu_smear(
 }
 
 
-__host__ void add_smear( simulation_data *d ) {
+__host__ void expose_and_smear( simulation_data *d ) {
 	int height = d->dimensions[0];
 	int width = d->dimensions[1];
 	int slice_image_width = width/d->number_of_slices;
@@ -114,14 +117,15 @@ __host__ void add_smear( simulation_data *d ) {
 	int slice_height = height + d->smear_rows + d->final_dark_rows;
 	int slice_size = slice_width*slice_height;
 	
-	cu_smear<<<d->number_of_slices, slice_image_width>>>( 
+	cu_expose_and_smear<<<d->number_of_slices, slice_image_width>>>( 
 		d->image_pixels, 
 		slice_size, 
 		d->early_dark_pixels,
 		d->smear_rows,
 		height,
 		slice_width,
-		d->smear_ratio );
+		d->smear_ratio,
+		d->exposure_time );
 		
 	PANIC_ON_BAD_CUDA_STATUS(cudaDeviceSynchronize());
 }

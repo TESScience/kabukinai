@@ -1,5 +1,5 @@
 SET(TRY_SLICING_SOURCES try_slicing.cu httm.cu kabukinai.h)
-SET(TRY_SMEAR_SOURCES try_smear.cu httm.cu kabukinai.h)
+SET(TRY_EXPOSE_AND_SMEAR_SOURCES try_expose_and_smear.cu httm.cu kabukinai.h)
 SET(TRY_NOISE_SOURCES try_noise.cu httm.cu kabukinai.h)
 
 CONFIGURE_FILE(generate_star_test_data_tsv.py generate_star_test_data_tsv.py COPYONLY)
@@ -24,9 +24,9 @@ ADD_TEST(
 )
 
 CUDA_ADD_EXECUTABLE(try_slicing ${TRY_SLICING_SOURCES})
-CUDA_ADD_EXECUTABLE(try_smear ${TRY_SMEAR_SOURCES})
+CUDA_ADD_EXECUTABLE(try_expose_and_smear ${TRY_EXPOSE_AND_SMEAR_SOURCES})
 CUDA_ADD_EXECUTABLE(try_noise ${TRY_NOISE_SOURCES})
 
 ADD_TEST(test_slicing try_slicing)
-ADD_TEST(test_smear try_smear)
+ADD_TEST(test_expose_and_smear try_expose_and_smear)
 ADD_TEST(test_noise try_noise)
