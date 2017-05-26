@@ -11,25 +11,49 @@ extern "C" {
 
 #define KABUKINAI_STAR_DATA_SUCCESS 0
 
+/*
+ * 2D pixel coordinates
+ */
 typedef struct {
     float x, y;
 } point_2d;
 
 /*
- * A star (using pixel coordinates) has x, y coordinates and an intensity for each star color.
+ * 3D coordinates
+ */
+typedef struct {
+    double x, y, z;
+} point_3d;
+
+/*
+ * A star using pixel coordinates has x and y coordinates and an intensity for each star color
  */
 typedef struct {
     point_2d point;
     float intensities[STAR_COLORS];
 } star_pixel_coordinate;
 
+/*
+ * Sky coordinates
+ */
 typedef struct {
-    float ra, dec;
+    double ra, dec;
 } sky_coordinate;
 
+/*
+ * A star using sky coordinates has a right ascension and declination and an intensity for each star color
+ */
 typedef struct {
-    float x, y, z;
-} point_3d;
+    sky_coordinate coordinate;
+    float intensities[STAR_COLORS];
+} star_sky_coordinate;
+
+/*
+ * Quaternions represent 3D rotations
+ */
+typedef struct {
+    double w, i, j, k;
+} quaternion;
 
 typedef struct {
     int x_dimension, y_dimension;
