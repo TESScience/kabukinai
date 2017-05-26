@@ -57,14 +57,14 @@ int read_psf_fits(psf_data * data, const char* fits_file_name) {
 	fits_open_image(&fits_file_pointer,  fits_file_name, READONLY, &status);
 	PANIC_ON_BAD_FITSIO_STATUS("Could not open file", status);
 
+	data->gamma = -1;	// impossible value for missing parameter
 	fits_read_key(fits_file_pointer, TDOUBLE, "GAMMA", &(data -> gamma), NULL, &status);
-	PANIC_ON_BAD_FITSIO_STATUS("Could not read GAMMA keyword in header", status);
 
 	fits_read_key(fits_file_pointer, TINT, "SLENGTH", &(data -> side_length), NULL, &status);
 	PANIC_ON_BAD_FITSIO_STATUS("Could not read SLENGTH keyword in header", status);
 
+	data->oversampling = -1;	// missing
 	fits_read_key(fits_file_pointer, TINT, "OVRSMPL", &(data -> oversampling), NULL, &status);
-	PANIC_ON_BAD_FITSIO_STATUS("Could not read OVRSMPL keyword in header", status);
 
 	fits_read_key(fits_file_pointer, TLONG, "NAXIS1", &(data -> dimensions[0]), NULL, &status);
 	PANIC_ON_BAD_FITSIO_STATUS("Could not read NAXIS1 keyword in header", status);
